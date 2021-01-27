@@ -174,20 +174,23 @@ class analysis():
 
 if __name__=="__main__":
     population_size = 10000
-    time = np.linspace(0,200,1000)
+    time = np.linspace(0,150,1000)
     model = FGE(N = population_size, t0 = 0)
     parameter = {
-            'R0': 1.5,
+            'R0': 2.5,
             'q': 0.3,
             'a': 0.25,
             'rho' : 1/6,
             'alpha' : 1/2,
             'beta' : 1/2,
             'delay':2.63,
-            'k0' : 6.3,
-            'I_0' : 1
+            'k0' : 6.3*1/0.33,
+            'I_0' : 1,
+            'follow_up': 0.1
             }
-    #a = np.linspace(0,1,100)
-    q = np.linspace(0,1,5)
-    a = np.linspace(0,1,30)
-    results = analysis(model,parameter,time).two_range_result_plot('a',a,'q',q, 'I_S')
+
+    q = [0.01,0.1,0.2,0.3,0.4,0.5]
+    a = np.linspace(0,1,20)
+    #liste = ['S','I','R','X']
+    #results = analysis(model,parameter,time).range_result('a',a,liste)
+    results = analysis(model,parameter,time).two_range_result_plot('a',a,'q',q,'I')

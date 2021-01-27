@@ -171,14 +171,47 @@ class SIRTXQ(BaseModel):
         self.model.set_initial_conditions({'I': p.I_0, 'S': self.N - p.I_0})
 
 class FGE(BaseModel):
+    """
+    extended SIRX with paper values
+    """
 
     def __init__(self, N, t0):
+        self.N = N
+        model = epipack.EpiModel(['S','I','R','X'],initial_population_size = self.N)
+        BaseModel.__init__(self, model, t0)
 
+    def set_parameters(self,parameters):
+        """
+        Set the parameter values for the model
+        Parameters
+        ----------
+        parameters : dict
+                {
+                    'R0' : ...,
+                }
+        """
+        p = ParamDict(parameters)
+        kappa = (p.q*p.rho)/(1-p.q)
+        kappa1 = 1/(1/(kappa)+p.delay)
+        self.model.set_processes([
+                    ('I', p.rho, 'R' ),
+                    ('I', kappa, 'X' ),
+                    ('I', 'I', kappa1 * p.a**2 * p.k0*0.64*p.follow_up, 'I', 'X' ),
+                    ('I', 'S',  p.R0*p.rho, 'I', 'I' )]),
+        self.model.set_initial_conditions({'I': p.I_0, 'S': self.N - p.I_0})
+class FGEE(BaseModel):
+     """
+     extended SIRX with pre and asymptomatic transmission and parameters of paper
+     """
+
+
+
+     def __init__(self, N, t0):
         self.N = N
         model = epipack.EpiModel(['S','E','I_P','I_S','I_A','R','X'],initial_population_size=N)
         BaseModel.__init__(self, model, t0)
 
-    def set_parameters(self,parameters):
+     def set_parameters(self,parameters):
         """
         Set the parameter values for this model
         Parameters
@@ -199,10 +232,10 @@ class FGE(BaseModel):
                     ('I_P', 0.6*p.beta, 'I_S'),
                     ('I_P', 0.4*p.beta, 'I_A'),
                     ('I_S', kappa, 'X'),
-                    ('I_S', 'E', kappa1 * p.a**2 * p.k0*0.64*0.1, 'I_S', 'X' ),
-                    ('I_S', 'I_P', kappa1 * p.a**2 * p.k0*0.64*0.1, 'I_S', 'X' ),
-                    ('I_S', 'I_A', kappa1 * p.a**2 * p.k0*0.64*0.1, 'I_S', 'X' ),
-                    ('I_S', 'I_S', kappa1 * p.a**2 * p.k0*0.64*0.1, 'I_S', 'X' ),
+                    ('I_S', 'E', kappa1 * p.a**2 * p.k0*0.64*p.follow_up, 'I_S', 'X' ),
+                    ('I_S', 'I_P', kappa1 * p.a**2 * p.k0*0.64*p.follow_up, 'I_S', 'X' ),
+                    ('I_S', 'I_A', kappa1 * p.a**2 * p.k0*0.64*p.follow_up, 'I_S', 'X' ),
+                    ('I_S', 'I_S', kappa1 * p.a**2 * p.k0*0.64*p.follow_up, 'I_S', 'X' ),
                     ('I_A', p.rho, 'R'),
                     ('I_S', p.rho, 'R')])
 
@@ -213,7 +246,7 @@ class FGE(BaseModel):
 if __name__=="__main__":
     population_size = 1000
     t = np.linspace(0,100,1000)
-    model = FGE(N = population_size, t0 = 0)
+    model = FGEE(N = population_size, t0 = 0)
     parameter = {
             'R0': 2.5,
             'q': 0.3,
@@ -222,7 +255,8 @@ if __name__=="__main__":
             'rho' : 1/6,
             'alpha' : 1/2,
             'beta' : 1/2,
-            'k0' : 6.3,
+            'k0' : 6.3*1/0.33,
+            'follow_up':0.1,
             'I_0' : 1
             }
     model.set_parameters(parameter)
