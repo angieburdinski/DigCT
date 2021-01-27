@@ -190,7 +190,7 @@ class FGE(BaseModel):
         """
         p = ParamDict(parameters)
         kappa = (p.q*p.rho)/(1-p.q)
-        kappa1 = 1/(1/(kappa)+p.delay))
+        kappa1 = 1/(1/(kappa)+p.delay)
         self.model.set_processes([
                     ('I_P', 'S', p.R0*p.beta/2, 'I_P', 'E' ),
                     ('I_A', 'S', p.R0*p.rho/4, 'I_P', 'E' ),
