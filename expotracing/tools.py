@@ -1,35 +1,65 @@
-from deterministic_model import SIRTX
+from deterministic_model import FGE
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 from matplotlib.lines import Line2D
-class range_analysis():
+class change(dict):
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+        self.__dict__ = self
+
+class analysis():
+
     """
-    This class provides functions for analyzing varying parameter combinations.
+    This class provides functions to analyse a model.
+
     Parameter
     ---------
     Model, Parameter, Time
+
     """
 
     def __init__(self,model,parameter,time):
         self.model = model
         self.parameter = parameter
         self.time = time
+        color =  dict(mcolors.TABLEAU_COLORS, **mcolors.CSS4_COLORS)
+        self.colors = [i for i in color.keys()]
 
-    def range_result_plot(self,parameter_change, parameter_range, compartment):
+    def result_plot(self):
         """
-        Analysis and plot of varying values of a parameter.
+        Function that plots number of individuals in each
+        compartment in contrast to increasing time.
+        """
+
+        self.model.set_parameters(parameter)
+        result = self.model.compute(self.time)
+        for i in result.keys():
+            plt.plot(self.time,result[i],color = self.colors[[i for i in result.keys()].index(i)],label = i)
+        plt.legend()
+        plt.xlabel('time [d]')
+        plt.ylabel('individuals')
+        plt.show()
+
+    def range_result(self,parameter_change, parameter_range,compartments):
+        """
+        Fuction to analyse the chosen model for varying values of a parameter.
+        Plots the results for chosen compartments
 
         Parameter
         -----------
-        Name of parameter (str)
-        Varying values of this parameter (list)
-        Compartment which is shown in a plot for the different values (str)
+        Name of varying parameter (str)
+        values of this parameter (list/array)
+        Compartments (list)
+
 
         Returns
         -----------
-        Plot and results of all compartments for varying parameter (dict)
+        Results of all compartments for varying parameter (dict)
+        and plot of the results for the chosen compartment for varying parameter.
+
         Example:
+
         Results = {
         0.1 : {
                 'S':...,
@@ -42,22 +72,25 @@ class range_analysis():
                 }
         }
         """
-
-        color =  dict(mcolors.TABLEAU_COLORS, **mcolors.CSS4_COLORS)
-        self.colors = [i for i in color.keys()]
-        self.compartment = compartment
         self.parameter_change = parameter_change
         self.parameter_range = parameter_range
+        self.compartments = compartments
+        fig, axs = plt.subplots(len(compartments),sharex=True, sharey=True )
 
         results = {}
         for i in self.parameter_range:
             self.parameter.update({self.parameter_change:i})
             self.model.set_parameters(self.parameter)
             results[i]= self.model.compute(self.time)
-            plt.plot(t,results[i][self.compartment],color = self.colors[self.parameter_range.index(i)],label = parameter_change + '='+ str(i))
+
+            for x in range(len(self.compartments)):
+                axs[x].plot(self.time,results[i][self.compartments[x]], color = self.colors[list(self.parameter_range).index(i)],label = self.parameter_change + '='+ str(i))
+
+            #plt.plot(self.time,results[i][self.compartment],color = self.colors[list(self.parameter_range).index(i)],label = parameter_change + '='+ str(i))
+
+                axs[x].set_xlabel('time [d]')
+                axs[x].set_ylabel(self.compartments[x])
         plt.legend()
-        plt.xlabel('time [d]')
-        plt.ylabel(compartment)
         plt.show()
         return results
 
@@ -96,8 +129,7 @@ class range_analysis():
                         }
         }
         """
-        color =  dict(mcolors.TABLEAU_COLORS, **mcolors.CSS4_COLORS)
-        self.colors = [i for i in color.keys()]
+
         self.compartment = compartment
         self.parameter_change1 = parameter_change1
         self.parameter_range1 = parameter_range1
@@ -127,55 +159,35 @@ class range_analysis():
         plt.show()
         return results
 
-class analysis_plot():
-    """
-    This class provides a plotting function for a given model with parameters and time a figure with
-    individuals of all compartments in contrast to time.
-    Parameter
-    ---------
-    Model, Parameter, Time
 
-    Returns
-    --------
-    Plot
-    """
-    def __init__(self,model,parameter,time):
 
-        self.model = model
-        self.parameter = parameter
-        self.time = time
 
-    def result_plot(self):
-        """
-        Plotting function
-        """
+    def I_red(self):
+        pass
 
-        color =  dict(mcolors.TABLEAU_COLORS, **mcolors.CSS4_COLORS)
-        self.colors = [i for i in color.keys()]
-        self.model.set_parameters(parameter)
-        result = self.model.compute(self.time)
-        for i in result.keys():
-            plt.plot(t,result[i],color = self.colors[[i for i in result.keys()].index(i)],label = i)
-        plt.legend()
-        plt.xlabel('time [d]')
-        plt.ylabel('individuals')
-        plt.show()
+    def RX(self):
+        pass
+    def Q(self):
+        pass
+
 
 
 if __name__=="__main__":
     population_size = 10000
-    time = np.linspace(0,300,1000)
-    model = SIRTX(N = population_size, t0 = 0)
+    time = np.linspace(0,200,1000)
+    model = FGE(N = population_size, t0 = 0)
     parameter = {
-            'R0': 2.5,
-            'q': 0.2,
-            'a': 0.3,
-            'rho' : 1/8,
+            'R0': 1.5,
+            'q': 0.3,
+            'a': 0.25,
+            'rho' : 1/6,
+            'alpha' : 1/2,
+            'beta' : 1/2,
+            'delay':2.63,
             'k0' : 6.3,
-            'I_0' : 1,
-            'chi' : 1/2
+            'I_0' : 1
             }
-    q_range = [0,0.01,0.1,0.2]
-    a_range = np.linspace(0,1,25)
-
-    results = range_analysis(model,parameter,time).two_range_result_plot('a', a_range,'q',q_range,'I')
+    #a = np.linspace(0,1,100)
+    q = np.linspace(0,1,5)
+    a = np.linspace(0,1,30)
+    results = analysis(model,parameter,time).two_range_result_plot('a',a,'q',q, 'I_S')
