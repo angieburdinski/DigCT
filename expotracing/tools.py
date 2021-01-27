@@ -1,4 +1,5 @@
 from deterministic_model import FGE
+from extendedmodel import Tracing
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
@@ -173,24 +174,26 @@ class analysis():
 
 
 if __name__=="__main__":
-    population_size = 10000
-    time = np.linspace(0,150,1000)
-    model = FGE(N = population_size, t0 = 0)
+    population_size = 80e6
+    time = np.linspace(0,365,1000)
+    model = Tracing(N = population_size, t0 = 0)
     parameter = {
             'R0': 2.5,
-            'q': 0.3,
-            'a': 0.25,
+            'q': ...,
+            'a': ...,
+            'chi':1/2.5,
             'rho' : 1/6,
             'alpha' : 1/2,
             'beta' : 1/2,
-            'delay':2.63,
-            'k0' : 6.3*1/0.33,
-            'I_0' : 1,
-            'follow_up': 0.1
+            'k0' : 6.3,
+            'x':0.6,
+            'y':0.1,
+            'z':0.64,
+            'I_0' : 1000,
+            'omega':1/10
             }
 
-    q = [0.01,0.1,0.2,0.3,0.4,0.5]
-    a = np.linspace(0,1,20)
-    #liste = ['S','I','R','X']
-    #results = analysis(model,parameter,time).range_result('a',a,liste)
-    results = analysis(model,parameter,time).two_range_result_plot('a',a,'q',q,'I')
+    q = np.linspace(0,1,10)
+    a = np.linspace(0,1,50)
+
+    results = analysis(model,parameter,time).two_range_result_plot('a',a,'q',q,'I_S')
