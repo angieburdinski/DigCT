@@ -264,15 +264,15 @@ class mixed_tracing():
                         ('I_S',p.recovery_rate,'R'),
                         ('I_S',kappa,'T'),
                         ('T',p.chi,'X'),
-                        ('E','T',p.chi*p.y*p.app_participation**2*p.number_of_contacts*p.z,'T','T'),
-                        ('I_P','T',p.chi*p.y*p.app_participation**2*p.number_of_contacts*p.z,'T','T'),
-                        ('I_S','T',p.chi*p.y*p.app_participation**2*p.number_of_contacts*p.z,'T','T'),
-                        ('I_A','T',p.chi*p.y*p.app_participation**2*p.number_of_contacts*p.z,'T','T'),
-                        ('S','T',p.chi*p.app_participation**2*p.number_of_contacts*p.z,'Q','T'),
-                        ('E','T',p.chi*(1-p.y)*p.app_participation**2*p.number_of_contacts*p.z,'X','T'),
-                        ('I_P','T',p.chi*(1-p.y)*p.app_participation**2*p.number_of_contacts*p.z,'X','T'),
-                        ('I_S','T',p.chi*(1-p.y)*p.app_participation**2*p.number_of_contacts*p.z,'X','T'),
-                        ('I_A','T',p.chi*(1-p.y)*p.app_participation**2*p.number_of_contacts*p.z,'X','T'),
+                        ('E','T',p.chi*p.y*p.app_participation*p.number_of_contacts*p.z,'T','T'),
+                        ('I_P','T',p.chi*p.y*p.app_participation*p.number_of_contacts*p.z,'T','T'),
+                        ('I_S','T',p.chi*p.y*p.app_participation*p.number_of_contacts*p.z,'T','T'),
+                        ('I_A','T',p.chi*p.y*p.app_participation*p.number_of_contacts*p.z,'T','T'),
+                        ('S','T',p.chi*p.app_participation*p.number_of_contacts*p.z,'Q','T'),
+                        ('E','T',p.chi*(1-p.y)*p.app_participation*p.number_of_contacts*p.z,'X','T'),
+                        ('I_P','T',p.chi*(1-p.y)*p.app_participation*p.number_of_contacts*p.z,'X','T'),
+                        ('I_S','T',p.chi*(1-p.y)*p.app_participation*p.number_of_contacts*p.z,'X','T'),
+                        ('I_A','T',p.chi*(1-p.y)*p.app_participation*p.number_of_contacts*p.z,'X','T'),
                         ('Q',p.omega,'S')])
         else:
             self.model.set_processes([
@@ -286,14 +286,14 @@ class mixed_tracing():
                         ('I_S',p.recovery_rate,'R'),
                         ('I_S',kappa,'T'),
                         ('T',p.chi,'X'),
-                        ('E','T',p.chi*p.y*p.app_participation**2*p.number_of_contacts*p.z,'T','T'),
-                        ('I_P','T',p.chi*p.y*p.app_participation**2*p.number_of_contacts*p.z,'T','T'),
-                        ('I_S','T',p.chi*p.y*p.app_participation**2*p.number_of_contacts*p.z,'T','T'),
-                        ('I_A','T',p.chi*p.y*p.app_participation**2*p.number_of_contacts*p.z,'T','T'),
-                        ('E','T',p.chi*(1-p.y)*p.app_participation**2*p.number_of_contacts*p.z,'X','T'),
-                        ('I_P','T',p.chi*(1-p.y)*p.app_participation**2*p.number_of_contacts*p.z,'X','T'),
-                        ('I_S','T',p.chi*(1-p.y)*p.app_participation**2*p.number_of_contacts*p.z,'X','T'),
-                        ('I_A','T',p.chi*(1-p.y)*p.app_participation**2*p.number_of_contacts*p.z,'X','T')])
+                        ('E','T',p.chi*p.y*p.app_participation*p.number_of_contacts*p.z,'T','T'),
+                        ('I_P','T',p.chi*p.y*p.app_participation*p.number_of_contacts*p.z,'T','T'),
+                        ('I_S','T',p.chi*p.y*p.app_participation*p.number_of_contacts*p.z,'T','T'),
+                        ('I_A','T',p.chi*p.y*p.app_participation*p.number_of_contacts*p.z,'T','T'),
+                        ('E','T',p.chi*(1-p.y)*p.app_participation*p.number_of_contacts*p.z,'X','T'),
+                        ('I_P','T',p.chi*(1-p.y)*p.app_participation*p.number_of_contacts*p.z,'X','T'),
+                        ('I_S','T',p.chi*(1-p.y)*p.app_participation*p.number_of_contacts*p.z,'X','T'),
+                        ('I_A','T',p.chi*(1-p.y)*p.app_participation*p.number_of_contacts*p.z,'X','T')])
 
         self.model.set_initial_conditions({'I_P': p.I_0, 'S': self.N - p.I_0})
 
