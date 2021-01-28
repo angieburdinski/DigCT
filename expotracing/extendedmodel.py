@@ -1,4 +1,4 @@
-p.app_participation*import epipack
+import epipack
 import numpy as np
 from bfmplot import pl as plt
 
@@ -75,7 +75,7 @@ class first_generation_tracing():
         """
 
         p = ParamDict(parameters)
-        kappa = (p.q*p.recovery_rate)/(1-p.q) 
+        kappa = (p.q*p.recovery_rate)/(1-p.q)
         if self.quarantine_S_contacts == True:
             self.model.set_processes([
                         ('I', p.recovery_rate, 'R' ),
