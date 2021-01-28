@@ -91,9 +91,9 @@ class analysis():
 
         return results
 
-    def two_range_result_plot(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2, compartment):
+    def two_range_result(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2, compartments):
         """
-        Analysis and plot of varying values of two parameters.
+        Analysis and plot of varying values of two parameters and plot the results of the compartments .
 
         Parameter
         -----------
@@ -101,7 +101,7 @@ class analysis():
         Varying values of this first parameter (list/array)
         Name of second parameter (str)
         Varying values of this second parameter (list/array)
-        Compartment which is shown in a plot for the different values (str)
+        Compartments which are shown in a plot for the different values (list)
 
         Returns
         -----------
@@ -127,11 +127,12 @@ class analysis():
         }
         """
 
-        self.compartment = compartment
+        self.compartments = compartments
         self.parameter_change1 = parameter_change1
         self.parameter_range1 = parameter_range1
         self.parameter_change2 = parameter_change2
         self.parameter_range2 = parameter_range2
+
 
         results = {}
         for i in self.parameter_range1:
@@ -143,50 +144,46 @@ class analysis():
             for j in self.parameter_range2:
                 self.parameter.update({self.parameter_change1:i})
                 self.parameter.update({self.parameter_change2:j})
-                self.model.set_parameters(parameter)
+                self.model.set_parameters(self.parameter)
                 results[i][j] = self.model.compute(self.t)
-                plt.plot(i,results[i][j][compartment].max(axis=0),'.', color = self.colors[list(self.parameter_range2).index(j)])
 
+        fig, axs = plt.subplots(1,len(self.compartments),sharex=True, sharey=True )
+
+        for y in self.compartments:
+            for i in self.parameter_range1:
+                for j in self.parameter_range2:
+                    axs[list(self.compartments).index(y)].plot(i,results[i][j][y].max(axis=0),'.', color = self.colors[list(self.parameter_range2).index(j)])
+            axs[list(self.compartments).index(y)].set_xlabel(self.parameter_change1)
+            axs[list(self.compartments).index(y)].set_ylabel(y)
         lines = [Line2D([0], [0], color=self.colors[x], linewidth=3, linestyle='dotted') for x in range(len(self.parameter_range2))]
         labels = [(str(self.parameter_change2) + '=' + str(j)) for j in self.parameter_range2]
-        plt.legend(lines,labels,loc='best')
-        plt.xlabel(self.parameter_change1)
-        plt.ylabel(compartment)
+        fig.legend(lines, labels)
         plt.show()
         return results
-
-    def I_red(self):
-        pass
-
-    def RX(self):
-        pass
-
-    def Q(self):
-        pass
-
 
 
 if __name__=="__main__":
     population_size = 80e6
     t = np.linspace(0,365,1000)
-    model = first_generation_tracing(N = population_size,quarantine_S_contacts = False)
+    model = mixed_tracing(N = population_size,quarantine_S_contacts = False)
     parameter = {
             'R0': 2.5,
             'q': 0.5,
-            'app_participation': 0.3,
+            'app_participation': 0.33,
             'chi':1/2.5,
             'recovery_rate' : 1/6,
             'alpha' : 1/2,
             'beta' : 1/2,
-            'number_of_contacts' : 6.3,
-            'x':0.6,
+            'number_of_contacts' : 6.3*1/0.33,
+            'x':0.4,
             'y':0.1,
             'z':0.64,
             'I_0' : 1000,
             'omega':1/10
             }
 
-    q = np.linspace(0,1,10)
-    a = np.linspace(0,1,50)
+    q = [0,0.01,0.2,0.4,0.6,0.8]
+    number_of_contacts = np.linspace(0,100,50)
+    #a = np.linspace(0,0.8,25)
 
-    results = analysis(model,parameter,t).range_result('a',a,['I','S'])
+    results = analysis(model,parameter,t).two_range_result('number_of_contacts',number_of_contacts,'q',q,['R','X'])
