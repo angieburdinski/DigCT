@@ -1,8 +1,6 @@
 from extendedmodel import (first_generation_tracing,next_generation_tracing,mixed_tracing)
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import colors as mcolors
-from matplotlib.lines import Line2D
 
 class analysis():
     """
@@ -29,31 +27,16 @@ class analysis():
         self.model = model
         self.parameter = parameter
         self.t = t
-        color =  dict(mcolors.TABLEAU_COLORS, **mcolors.CSS4_COLORS)
-        self.colors = [i for i in color.keys()]
 
-    def basic(self):
-        """
-        Function that plots number of individuals in each
-        compartment in contrast to increasing time.
-        """
-        self.model.set_parameters(self.parameter)
-        result = self.model.compute(self.t)
-        for i in result.keys():
-            plt.plot(t,result[i],color = self.colors[[i for i in result.keys()].index(i)],label = i)
-        plt.legend()
-        plt.xlabel('time [d]')
-        plt.ylabel('individuals')
-        plt.show()
 
-    def range_result(self,parameter_change, parameter_range, compartments):
+    def range_result(self,parameter_change, parameter_range):
         """
         Fuction to analyse the chosen model for varying values of a parameter.
 
         Parameter
         -----------
         Name of varying parameter (str)
-        values of this parameter (list/array)
+        Values of this parameter (list/array)
 
         Returns
         -----------
@@ -74,21 +57,11 @@ class analysis():
         """
         self.parameter_change = parameter_change
         self.parameter_range = parameter_range
-        self.compartments = compartments
-        fig, axs = plt.subplots(len(compartments),sharex=True, sharey=True )
         results = {}
         for i in self.parameter_range:
             self.parameter.update({self.parameter_change:i})
             self.model.set_parameters(self.parameter)
             results[i]= self.model.compute(self.t)
-
-            for x in range(len(self.compartments)):
-                axs[x].plot(self.t,results[i][self.compartments[x]], color = self.colors[list(self.parameter_range).index(i)],label = self.parameter_change + '='+ str(i))
-                axs[x].set_xlabel('time [d]')
-                axs[x].set_ylabel(self.compartments[x])
-        plt.legend()
-        plt.show()
-
         return results
 
     def two_range_result(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2, compartments):
@@ -146,19 +119,6 @@ class analysis():
                 self.parameter.update({self.parameter_change2:j})
                 self.model.set_parameters(self.parameter)
                 results[i][j] = self.model.compute(self.t)
-
-        fig, axs = plt.subplots(1,len(self.compartments),sharex=True, sharey=True )
-
-        for y in self.compartments:
-            for i in self.parameter_range1:
-                for j in self.parameter_range2:
-                    axs[list(self.compartments).index(y)].plot(i,results[i][j][y].max(axis=0),'.', color = self.colors[list(self.parameter_range2).index(j)])
-            axs[list(self.compartments).index(y)].set_xlabel(self.parameter_change1)
-            axs[list(self.compartments).index(y)].set_ylabel(y)
-        lines = [Line2D([0], [0], color=self.colors[x], linewidth=3, linestyle='dotted') for x in range(len(self.parameter_range2))]
-        labels = [(str(self.parameter_change2) + '=' + str(j)) for j in self.parameter_range2]
-        fig.legend(lines, labels)
-        plt.show()
         return results
 
 

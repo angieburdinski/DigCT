@@ -9,14 +9,9 @@ class ParamDict(dict):
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
         self.__dict__ = self
-
 class first_generation_tracing():
     """
     This class provides a first generation tracing system on an SIR-based pandemic.
-    Parameter
-    ---------
-    Number of individuals (float) : N
-    Quarantining of susceptible contacts (boolean): quarantine_S_contacts
 
     Example
     --------
@@ -26,7 +21,13 @@ class first_generation_tracing():
 
     """
     def __init__(self,N,quarantine_S_contacts):
-
+        """
+        __init__ intializes the model object.
+        Parameter
+        ---------
+        Number of individuals (float) : N
+        Quarantining of susceptible contacts (boolean): quarantine_S_contacts
+        """
         self.N = N
         self.quarantine_S_contacts = quarantine_S_contacts
         if self.quarantine_S_contacts == True:
@@ -38,7 +39,8 @@ class first_generation_tracing():
 
     def compute(self, t):
         """
-        This function calculates the integration of the chosen model.
+        The compute function calculates the integration of the chosen model with
+        integrator = 'dopri5'.
         Parameter
         ---------
         time (array or list) : t
@@ -62,6 +64,9 @@ class first_generation_tracing():
         Parameter
         ---------
         Dictionary of parameters (dict) : parameters
+
+        Example
+        -------
         parameters = {
                         'R0' : ...,
                         'I_0' : ...,
@@ -96,10 +101,6 @@ class first_generation_tracing():
 class next_generation_tracing():
     """
     This class provides a next generation tracing system on an SIR-based pandemic.
-    Parameter
-    ---------
-    Number of individuals (float) : N
-    Quarantining of susceptible contacts (boolean): quarantine_S_contacts
 
     Example
     --------
@@ -109,7 +110,13 @@ class next_generation_tracing():
 
     """
     def __init__(self, N, quarantine_S_contacts):
-
+        """
+        __init__ intializes the model object.
+        Parameter
+        ---------
+        Number of individuals (float) : N
+        Quarantining of susceptible contacts (boolean): quarantine_S_contacts
+        """
         self.N = N
         self.quarantine_S_contacts = quarantine_S_contacts
         if self.quarantine_S_contacts == True:
@@ -121,7 +128,8 @@ class next_generation_tracing():
 
     def compute(self, t):
         """
-        This function calculates the integration of the chosen model.
+        This function calculates the integration of the chosen model with
+        integrator = 'dopri5'.
         Parameter
         ---------
         time (array or list) : t
@@ -142,9 +150,13 @@ class next_generation_tracing():
     def set_parameters(self,parameters):
         """
         This function sets the processes and parameters of the chosen model.
+
         Parameter
         ---------
         Dictionary of parameters (dict) : parameters
+
+        Example
+        -------
         parameters = {
                         'R0' : ...,
                         'I_0' : ...,
@@ -182,11 +194,12 @@ class next_generation_tracing():
 
 class mixed_tracing():
     """
-    This class provides a mix of the first and next generation tracing system on an SIR-based pandemic.
-    Parameter
-    ---------
-    Number of individuals (float) : N
-    Quarantining of susceptible contacts (boolean): quarantine_S_contacts
+    This class provides a mix of the first and next generation tracing system
+    on an SIR-based pandemic. !! Attention !! This model is for analyzing the
+    parameters of the La Gomera study. Due to the changed tracing term the usual
+    number of contacts (real) is exchanged with number of contacts (measured) per
+    app participation leading to a linear influence of app participation multiplied
+    with measured number of contacts.
 
     Example
     --------
@@ -197,7 +210,13 @@ class mixed_tracing():
     """
 
     def __init__(self, N, quarantine_S_contacts):
-
+        """
+        __init__ intializes the model object.
+        Parameter
+        ---------
+        Number of individuals (float) : N
+        Quarantining of susceptible contacts (boolean): quarantine_S_contacts
+        """
         self.quarantine_S_contacts = quarantine_S_contacts
         self.N = N
         if self.quarantine_S_contacts == True:
@@ -209,7 +228,8 @@ class mixed_tracing():
 
     def compute(self, t):
         """
-        This function calculates the integration of the chosen model.
+        The compute function calculates the integration of the chosen model with
+        integrator = 'dopri5'.
         Parameter
         ---------
         time (array or list) : t
@@ -233,20 +253,23 @@ class mixed_tracing():
         Parameter
         ---------
         Dictionary of parameters (dict) : parameters
+
+        Example
+        --------
         parameters = {
                         'R0' : ...,
                         'I_0' : ...,
-                        'beta' : ...,
-                        'alpha' : ...,
+                        'beta' : ..., # rate of becoming symptomatic or asymptomatic
+                        'alpha' : ...,# rate of becoming presymptomatic
                         'recovery_rate' : ...,
                         'omega' : ..., # only needed if quarantine_S_contacts = True
-                        'chi' : ...,
-                        'x' : ...,
-                        'y' : ...,
-                        'z' : ...,
+                        'chi' : ..., # rate of entering infected-quarantined compartment from traced
+                        'x' : ..., # fraction of individuals becoming symptomatic
+                        'y' : 0.1, # fraction of individuals participating in next generation tracing
+                        'z' : 0.64, # fraction of individuals inducing tracing
                         'app_participation' : ...,
-                        'q' : ...,
-                        'number_of_contacts' : ...
+                        'q' : ..., # fraction of detected and isolated symptomatic individuals
+                        'number_of_contacts' : 6.3
 
         }
         """
@@ -255,8 +278,8 @@ class mixed_tracing():
         if self.quarantine_S_contacts == True:
             self.model.set_processes([
                         ('S','I_P',p.R0*p.beta/2,'E','I_P'),
-                        ('S','I_A',p.R0*p.recovery_rate/4,'E','I_A'),
-                        ('S','I_S',p.R0*p.recovery_rate/4,'E','I_S'),
+                        ('S','I_A',p.R0*p.recovery_rate/2,'E','I_A'),
+                        ('S','I_S',p.R0*p.recovery_rate/2,'E','I_S'),
                         ('E',p.alpha,'I_P'),
                         ('I_P',(1-p.x)*p.beta,'I_S'),
                         ('I_P',p.x*p.beta,'I_A'),

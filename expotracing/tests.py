@@ -26,4 +26,10 @@ app_participation = np.linspace(0,1,50)
 
 results = an(model,parameters,t).two_range_result('app_participation',app_participation,'q',q,['X','I_S'])
 
+x = []
+for i in app_participation:
+    for j in q:
+        x.append(results[i][j]['R'].max(axis = 0)+results[i][j]['X'].max(axis = 0))
+
+plt.plot(x)
 #results = an(model,parameters,t).range_result('app_participation',app_participation,['T','X'])
