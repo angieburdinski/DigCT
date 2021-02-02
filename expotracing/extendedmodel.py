@@ -400,7 +400,7 @@ class stoch_mixed_tracing():
                         'z' : 0.64, # fraction of individuals inducing tracing
                         'app_participation' : ...,
                         'q' : ..., # fraction of detected and isolated symptomatic individuals
-                        'number_of_contacts' : 6.3
+    
 
         }
         """

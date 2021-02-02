@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 from matplotlib.lines import Line2D
-import networkx as nx 
+import networkx as nx
 
 class plot():
 
@@ -23,7 +23,7 @@ class plot():
         self.model.set_parameters(self.parameter)
         result = self.model.compute(self.t)
         for i in result.keys():
-            plt.plot(t,result[i],color = self.colors[[i for i in result.keys()].index(i)],label = i)
+            plt.plot(self.t,result[i],color = self.colors[[i for i in result.keys()].index(i)],label = i)
         plt.legend()
         plt.xlabel('time [d]')
         plt.ylabel('individuals')
@@ -88,7 +88,7 @@ class plot():
                 self.parameter.update({self.parameter_change1:i})
                 self.parameter.update({self.parameter_change2:j})
                 self.model.set_parameters(self.parameter)
-                results[i][j] = self.model.compute(self.t)
+                t, results[i][j] = self.model.compute(self.t)
 
         fig, axs = plt.subplots(1,len(self.compartments),figsize = (len(compartments)*3,3), sharex=True, sharey=True )
 
@@ -103,8 +103,8 @@ class plot():
         fig.legend(lines, labels)
         plt.show()
 if __name__=="__main__":
-    N = 10000
-    k0 = 50
+    N = 10
+    k0 = 2
     G = nx.barabasi_albert_graph(N,k0)
     t=1000
 
@@ -117,16 +117,16 @@ if __name__=="__main__":
             'recovery_rate' : 1/6,
             'alpha' : 1/2,
             'beta' : 1/2,
-            'number_of_contacts' : 6.3*1/0.33,
+            #'number_of_contacts' : 6.3*1/0.33,
             'x':0.83,
             'y':0.1,
             'z':0.64,
-            'I_0' : 1000,
+            'I_0' : 1,
             'omega':1/10
             }
 
     q = [0,0.01,0.2,0.4,0.6,0.8]
-    number_of_contacts = np.linspace(0,100,50)
-    #a = np.linspace(0,0.8,25)
+    #number_of_contacts = np.linspace(0,100,50)
+    a = np.linspace(0,0.8,5)
 
-    results = plot(model,parameter,t).two_range_plot('number_of_contacts',number_of_contacts,'q',q,['R','X'])
+    results = plot(model,parameter,t).two_range_plot('app_participation',a,'q',q,['Ra','Xa','R','X'])
