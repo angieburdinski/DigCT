@@ -1,8 +1,9 @@
-from extendedmodel import (first_generation_tracing,next_generation_tracing,mixed_tracing)
+from extendedmodel import (first_generation_tracing,next_generation_tracing,mixed_tracing,stoch_mixed_tracing)
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 from matplotlib.lines import Line2D
+import networkx as nx 
 
 class plot():
 
@@ -102,9 +103,12 @@ class plot():
         fig.legend(lines, labels)
         plt.show()
 if __name__=="__main__":
-    population_size = 80e6
-    t = np.linspace(0,365,1000)
-    model = mixed_tracing(N = population_size,quarantine_S_contacts = False)
+    N = 10000
+    k0 = 50
+    G = nx.barabasi_albert_graph(N,k0)
+    t=1000
+
+    model = stoch_mixed_tracing(G,quarantine_S_contacts = False)
     parameter = {
             'R0': 2.5,
             'q': 0.5,
@@ -114,7 +118,7 @@ if __name__=="__main__":
             'alpha' : 1/2,
             'beta' : 1/2,
             'number_of_contacts' : 6.3*1/0.33,
-            'x':0.4,
+            'x':0.83,
             'y':0.1,
             'z':0.64,
             'I_0' : 1000,
