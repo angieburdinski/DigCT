@@ -64,7 +64,7 @@ class analysis():
             results[i]= self.model.compute(self.t)
         return results
 
-    def two_range_result(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2, compartments):
+    def two_range_result(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2):
         """
         Analysis and plot of varying values of two parameters and plot the results of the compartments .
 
@@ -100,7 +100,7 @@ class analysis():
         }
         """
 
-        self.compartments = compartments
+
         self.parameter_change1 = parameter_change1
         self.parameter_range1 = parameter_range1
         self.parameter_change2 = parameter_change2
@@ -146,4 +146,4 @@ if __name__=="__main__":
     number_of_contacts = np.linspace(0,100,50)
     #a = np.linspace(0,0.8,25)
 
-    results = analysis(model,parameter,t).two_range_result('number_of_contacts',number_of_contacts,'q',q,['R','X'])
+    results = analysis(model,parameter,t).two_range_result('number_of_contacts',number_of_contacts,'q',q)

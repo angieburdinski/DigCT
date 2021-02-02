@@ -103,7 +103,7 @@ class plot():
         fig.legend(lines, labels)
         plt.show()
 if __name__=="__main__":
-    N = 10
+    N = 1000
     k0 = 2
     G = nx.barabasi_albert_graph(N,k0)
     t=1000
@@ -121,12 +121,12 @@ if __name__=="__main__":
             'x':0.83,
             'y':0.1,
             'z':0.64,
-            'I_0' : 1,
+            'I_0' : 10,
             'omega':1/10
             }
 
     q = [0,0.01,0.2,0.4,0.6,0.8]
     #number_of_contacts = np.linspace(0,100,50)
-    a = np.linspace(0,0.8,5)
+    a = np.linspace(0,0.8,20)
 
     results = plot(model,parameter,t).two_range_plot('app_participation',a,'q',q,['Ra','Xa','R','X'])
