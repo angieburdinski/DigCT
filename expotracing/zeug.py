@@ -27,7 +27,7 @@ parameter = {
         'x':0.17,
         'y':0.1,
         'z':0.64,
-        'I_0' : 10,
+        'I_0' : 100,
         'omega':1/10
         }
 from matplotlib import rc
@@ -35,7 +35,7 @@ plt.rcParams.update({'font.size': 13})
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 q = [0,0.2,0.4,0.6,0.8]
 
-a = np.linspace(0,0.8,2)
+a = np.linspace(0,0.8,10)
 t, result = analysis(model,parameter).stoch_two_range_result('app_participation',a,'q',q,t)
 print(result)
 fig, axs = plt.subplots(1,3,figsize = (18,3))

@@ -203,7 +203,7 @@ class mixed_tracing():
 
     Example
     --------
-    model = mixed_generation_tracing(N = 1000, quarantine_S_contacts = True)
+    model = mixed_tracing(N = 1000, quarantine_S_contacts = True)
     model.set_parameters(parameters)
     result = model.compute(t)
 
@@ -322,7 +322,7 @@ class mixed_tracing():
 
 class stoch_mixed_tracing():
     """
-    This class provides a mix of the first and next generation tracing system
+    This class provides a stochastic model mixed generation system
     on an SIR-based pandemic. !! Attention !! This model is for analyzing the
     parameters of the La Gomera study. Due to the changed tracing term the usual
     number of contacts (real) is exchanged with number of contacts (measured) per
@@ -331,9 +331,9 @@ class stoch_mixed_tracing():
 
     Example
     --------
-    model = mixed_generation_tracing(N = 1000, quarantine_S_contacts = True)
+    model = stoch_mixed_tracing(G, quarantine_S_contacts = True)
     model.set_parameters(parameters)
-    result = model.compute(t)
+    t, result = model.compute(t)
 
     """
 
@@ -342,7 +342,7 @@ class stoch_mixed_tracing():
         __init__ intializes the model object.
         Parameter
         ---------
-        Number of individuals (float) : N
+        Network (nx-object) : G
         Quarantining of susceptible contacts (boolean): quarantine_S_contacts
         """
         self.quarantine_S_contacts = quarantine_S_contacts
@@ -363,16 +363,12 @@ class stoch_mixed_tracing():
         integrator = 'dopri5'.
         Parameter
         ---------
-        time (array or list) : t
+        time (int) : time
 
         Returns
         -------
-        Dictionary of results
+        time (list),  results (dict)
 
-        result = {
-                'S': ....,
-                'I': ....,
-                }
         """
         t, result = self.model.simulate(time)
         self.result = result
@@ -534,6 +530,7 @@ if __name__=="__main__":
     model = stoch_mixed_tracing(G,False)
     model.set_parameters(parameter)
     t,result = model.compute(10000)
+    print(t,result)
     plt.figure()
 
     for comp, series in result.items():

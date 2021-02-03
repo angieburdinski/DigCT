@@ -4,15 +4,35 @@ import matplotlib.pyplot as plt
 from math import exp
 import networkx as  nx
 class configuration_network():
+    """
+    A Class to build a configuration network with an exponential degree
+    distribution.
+
+    Parameter
+    ---------
+    Number of individuals (int) : N
+    Mean contact number (int) : k0
+    """
     def __init__(self,N,k0):
+        """
+        Initalizes the configuration network
+        """
         self.k0 = k0
         self.N = N
+
     def build(self):
+        """
+        This function builds the Network without selfloops or multiedges.
+
+        Returns
+        ------
+        G (networkx object)
+        """
         def expodegree(x):
             return exp(-x/self.k0)
         P = []
         k = []
-        for i in range(10000*self.k0):
+        for i in range(self.N):
             p_k = expodegree(i)
             P.append(p_k)
             k.append(i)
@@ -40,11 +60,11 @@ class configuration_network():
 
 class analysis():
     """
-    This class provides functions to analyse a model and plot the chosen analysis.
+    This class provides functions to analyze a model.
 
     Parameter
     ---------
-    Model, Parameter (dict), Time (list/array)
+    Model, Parameter (dict)
 
     Example
     -------
@@ -55,7 +75,7 @@ class analysis():
             'R0': ...,
         }
 
-    analysis(model,parameter,t)
+    analysis(model,parameter)
     """
 
     def __init__(self,model,parameter):
@@ -70,8 +90,9 @@ class analysis():
 
         Parameter
         -----------
-        Name of varying parameter (str)
-        Values of this parameter (list/array)
+        Name of varying parameter (str) : parameter_change
+        Values of this parameter (list/array) : parameter_range
+        Time (list/array) : t
 
         Returns
         -----------
@@ -102,19 +123,20 @@ class analysis():
 
     def stoch_range_result(self,parameter_change, parameter_range,time):
         """
-        Fuction to analyse the chosen model for varying values of a parameter.
+        Fuction to analyse the chosen stochastic model for varying values of a parameter.
 
         Parameter
         -----------
-        Name of varying parameter (str)
-        Values of this parameter (list/array)
+        Name of varying parameter (str) : parameter_change
+        Values of this parameter (list/array) : parameter_range
+        Time (int) : time
 
         Returns
         -----------
-        Results of all compartments for varying parameter (dict)
+        Time (list), results of all compartments for varying parameter (dict)
         Example:
 
-        Results = {
+        t (list), result = {
         0.1 : {
                 'S':...,
                 'I':...,
@@ -138,19 +160,19 @@ class analysis():
 
     def two_range_result(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2,t):
         """
-        Analysis and plot of varying values of two parameters and plot the results of the compartments .
+        Analysis of varying values of two parameters.
 
         Parameter
         -----------
-        Name of first parameter (str)
-        Varying values of this first parameter (list/array)
-        Name of second parameter (str)
-        Varying values of this second parameter (list/array)
-        Compartments which are shown in a plot for the different values (list)
+        Name of first parameter (str) : parameter_change1
+        Varying values of this first parameter (list/array) : parameter_range1
+        Name of second parameter (str) : parameter_change2
+        Varying values of this second parameter (list/array) : parameter_range2
+        Time (list/array) : t
 
         Returns
         -----------
-        Plot and results of all compartments for varying parameter (dict)
+        Results of all compartments for varying parameter (dict)
         Example:
         Results = {
         0.1 : {
@@ -195,21 +217,21 @@ class analysis():
 
     def stoch_two_range_result(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2,time):
             """
-            Analysis and plot of varying values of two parameters and plot the results of the compartments .
+            Analysis of varying values of two parameters.
 
             Parameter
             -----------
-            Name of first parameter (str)
-            Varying values of this first parameter (list/array)
-            Name of second parameter (str)
-            Varying values of this second parameter (list/array)
-            Compartments which are shown in a plot for the different values (list)
+            Name of first parameter (str) : parameter_change1
+            Varying values of this first parameter (list/array) : parameter_range1
+            Name of second parameter (str) : parameter_change2
+            Varying values of this second parameter (list/array) : parameter_range2
+            Time (int) : time
 
             Returns
             -----------
-            Plot and results of all compartments for varying parameter (dict)
+            Time (list) and results of all compartments for varying parameter (dict)
             Example:
-            Results = {
+            t (list) , result = {
             0.1 : {
                     0.0 : {
                             'S':...,

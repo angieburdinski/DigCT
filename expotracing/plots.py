@@ -18,6 +18,10 @@ class plot():
         """
         Function that plots number of individuals in each
         compartment in contrast to increasing time.
+
+        Parameter
+        ----------
+        Time (list/array) : t
         """
         self.t = t
         self.model.set_parameters(self.parameter)
@@ -33,6 +37,10 @@ class plot():
         """
         Function that plots number of individuals in each
         compartment in contrast to increasing time.
+
+        Parameter
+        ----------
+        Time (int) : time
         """
         self.time = time
         self.model.set_parameters(self.parameter)
@@ -50,9 +58,10 @@ class plot():
 
         Parameter
         -----------
-        Name of varying parameter (str)
-        Values of this parameter (list/array)
-        Compartments  (list)
+        Name of varying parameter (str) : parameter_change
+        Values of this parameter (list/array) : parameter_range
+        Compartments  (list) : compartments
+        Time (list/array) : t
 
         """
         self.parameter_change = parameter_change
@@ -78,9 +87,10 @@ class plot():
 
             Parameter
             -----------
-            Name of varying parameter (str)
-            Values of this parameter (list/array)
-            Compartments  (list)
+            Name of varying parameter (str) : parameter_change
+            Values of this parameter (list/array) : parameter_range
+            Compartments  (list) : compartments
+            Time (int) : time
 
             """
             self.parameter_change = parameter_change
@@ -106,11 +116,12 @@ class plot():
 
         Parameter
         -----------
-        Name of first parameter (str)
-        Varying values of this first parameter (list/array)
-        Name of second parameter (str)
-        Varying values of this second parameter (list/array)
-        Compartments which are shown in a plot for the different values (list)
+        Name of first parameter (str) : parameter_change1
+        Varying values of this first parameter (list/array) : parameter_range1
+        Name of second parameter (str) : parameter_change2
+        Varying values of this second parameter (list/array) : parameter_range2
+        Compartments which are shown in a plot for the different values (list) : compartments
+        Time (list/array) : t
 
         """
         self.t = t
@@ -153,12 +164,12 @@ class plot():
 
             Parameter
             -----------
-            Name of first parameter (str)
-            Varying values of this first parameter (list/array)
-            Name of second parameter (str)
-            Varying values of this second parameter (list/array)
-            Compartments which are shown in a plot for the different values (list)
-
+            Name of first parameter (str) : parameter_change1
+            Varying values of this first parameter (list/array) : parameter_range1
+            Name of second parameter (str) : parameter_change2
+            Varying values of this second parameter (list/array) : parameter_range2
+            Compartments which are shown in a plot for the different values (list) : compartments
+            Time (int) : time
             """
             self.time = time
             self.compartments = compartments
@@ -193,6 +204,7 @@ class plot():
             labels = [(str(self.parameter_change2) + '=' + str(j)) for j in self.parameter_range2]
             fig.legend(lines, labels)
             plt.show()
+            
 if __name__=="__main__":
     N = 1000
     k0 = 2
