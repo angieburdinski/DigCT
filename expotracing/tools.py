@@ -46,7 +46,7 @@ class configuration_network():
                   self.N,
                   p = P
                 )
-            print(sum(expected_degree_sequence)/self.N)
+
             return expected_degree_sequence
 
 
