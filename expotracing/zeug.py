@@ -1,4 +1,5 @@
 from extendedmodel import stoch_mixed_tracing
+from extendedmodel import mixed_tracing
 from tools import configuration_network
 from plots import plot
 import networkx as nx
@@ -14,6 +15,7 @@ N = 10000
 k0 = 19
 G = configuration_network(N,k0).build()
 t = 10000
+#t = np.linspace(0,500,500)
 model = stoch_mixed_tracing(G,quarantine_S_contacts = True)
 parameter = {
         'R0': 2.5,
@@ -35,13 +37,13 @@ plt.rcParams.update({'font.size': 13})
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 q = [0,0.2,0.4,0.6,0.8]
 
-a = np.linspace(0,0.8,10)
-t, result = analysis(model,parameter).stoch_two_range_result('app_participation',a,'q',q,t)
-print(result)
-fig, axs = plt.subplots(1,3,figsize = (18,3))
+a = np.linspace(0,0.8,50)
+t,result = analysis(model,parameter).stoch_two_range_result('app_participation',a,'q',q,t)
+
+fig, axs = plt.subplots(1,3,figsize = (20,3))
 for i in a:
     for j in q:
-        axs[0].plot(i, (result[i][j]['R'].max(axis = 0)+result[i][j]['Ra'].max(axis = 0)+result[i][j]['Xa'].max(axis = 0)+result[i][j]['X'].max(axis = 0))/N,'.', color = colors[q.index(j)])
+        axs[0].plot(i, (result[i][j]['R'].max(axis = 0)+result[i][j]['Ra'].max(axis = 0)+result[i][j]['X'].max(axis = 0)+result[i][j]['Xa'].max(axis = 0))/N,'.', color = colors[q.index(j)])
         axs[1].plot(i, (result[i][j]['I_S'].max(axis = 0)+result[i][j]['I_Sa'].max(axis = 0))/N,'.', color = colors[q.index(j)])
         axs[2].plot(i, (result[i][j]['Qa'].max(axis = 0))/N,'.', color = colors[q.index(j)])
 axs[0].set_xlabel('app participation')

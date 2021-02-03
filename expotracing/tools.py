@@ -29,7 +29,7 @@ class configuration_network():
         G (networkx object)
         """
         def expodegree(x):
-            return exp(-x/self.k0)
+            return 1/self.k0*exp(-x/self.k0)
         P = []
         k = []
         for i in range(self.N):
@@ -46,7 +46,7 @@ class configuration_network():
                   self.N,
                   p = P
                 )
-
+            print(sum(expected_degree_sequence)/self.N)
             return expected_degree_sequence
 
 
