@@ -351,13 +351,13 @@ class stoch_mixed_tracing():
         self.edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
         self.k_norm = 2*len(self.edge_weight_tuples) / self.N
         if self.quarantine_S_contacts == True:
-            model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa'],self.N, self.edge_weight_tuples)
+            model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa'],self.N, self.edge_weight_tuples,directed=False)
             self.model = model
         else:
-            model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa'],self.N,self.edge_weight_tuples)
+            model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa'],self.N,self.edge_weight_tuples,directed=False)
             self.model = model
 
-    def compute(self, t):
+    def compute(self, time):
         """
         The compute function calculates the integration of the chosen model with
         integrator = 'dopri5'.
@@ -374,9 +374,10 @@ class stoch_mixed_tracing():
                 'I': ....,
                 }
         """
-        result = self.model.simulate(t)
+        t, result = self.model.simulate(time)
         self.result = result
-        return result
+        self.t = t
+        return t, result
 
     def set_parameters(self,parameters):
         """

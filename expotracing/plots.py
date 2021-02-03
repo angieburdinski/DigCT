@@ -7,19 +7,19 @@ import networkx as nx
 
 class plot():
 
-    def __init__(self,model,parameter,t):
+    def __init__(self,model,parameter):
 
         self.model = model
         self.parameter = parameter
-        self.t = t
         color =  dict(mcolors.TABLEAU_COLORS, **mcolors.CSS4_COLORS)
         self.colors = [i for i in color.keys()]
 
-    def basic(self):
+    def basic(self,t):
         """
         Function that plots number of individuals in each
         compartment in contrast to increasing time.
         """
+        self.t = t
         self.model.set_parameters(self.parameter)
         result = self.model.compute(self.t)
         for i in result.keys():
@@ -29,7 +29,22 @@ class plot():
         plt.ylabel('individuals')
         plt.show()
 
-    def range_plot(self,parameter_change, parameter_range, compartments):
+    def stoch_basic(self,time):
+        """
+        Function that plots number of individuals in each
+        compartment in contrast to increasing time.
+        """
+        self.time = time
+        self.model.set_parameters(self.parameter)
+        t, result = self.model.compute(self.time)
+        for i in result.keys():
+            plt.plot(t,result[i],color = self.colors[[i for i in result.keys()].index(i)],label = i)
+        plt.legend()
+        plt.xlabel('time [d]')
+        plt.ylabel('individuals')
+        plt.show()
+
+    def range_plot(self,parameter_change, parameter_range, compartments,t):
         """
         Fuction to plot the chosen model for varying values of a parameter.
 
@@ -43,6 +58,7 @@ class plot():
         self.parameter_change = parameter_change
         self.parameter_range = parameter_range
         self.compartments = compartments
+        self.t = t
         fig, axs = plt.subplots(1,len(compartments),figsize = (len(compartments)*3,3),sharex=True, sharey=True )
         results = {}
         for i in self.parameter_range:
@@ -56,7 +72,35 @@ class plot():
         plt.legend()
         plt.show()
 
-    def two_range_plot(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2, compartments):
+    def stoch_range_plot(self,parameter_change, parameter_range, compartments,time):
+            """
+            Fuction to plot the chosen model for varying values of a parameter.
+
+            Parameter
+            -----------
+            Name of varying parameter (str)
+            Values of this parameter (list/array)
+            Compartments  (list)
+
+            """
+            self.parameter_change = parameter_change
+            self.parameter_range = parameter_range
+            self.compartments = compartments
+            self.time = time
+            fig, axs = plt.subplots(1,len(compartments),figsize = (len(compartments)*3,3),sharex=True, sharey=True )
+            results = {}
+            for i in self.parameter_range:
+                self.parameter.update({self.parameter_change:i})
+                self.model.set_parameters(self.parameter)
+                t, results[i]= self.model.compute(self.time)
+                for x in range(len(self.compartments)):
+                    axs[x].plot(t,results[i][self.compartments[x]], color = self.colors[list(self.parameter_range).index(i)],label = self.parameter_change + '='+ str(i))
+                    axs[x].set_xlabel('time [d]')
+                    axs[x].set_ylabel(self.compartments[x])
+            plt.legend()
+            plt.show()
+
+    def two_range_plot(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2, compartments,t):
         """
         Plot of varying values of two parameters and plot the results of the compartments .
 
@@ -69,7 +113,7 @@ class plot():
         Compartments which are shown in a plot for the different values (list)
 
         """
-
+        self.t = t
         self.compartments = compartments
         self.parameter_change1 = parameter_change1
         self.parameter_range1 = parameter_range1
@@ -88,7 +132,7 @@ class plot():
                 self.parameter.update({self.parameter_change1:i})
                 self.parameter.update({self.parameter_change2:j})
                 self.model.set_parameters(self.parameter)
-                t, results[i][j] = self.model.compute(self.t)
+                results[i][j] = self.model.compute(self.t)
 
         fig, axs = plt.subplots(1,len(self.compartments),figsize = (len(compartments)*3,3), sharex=True, sharey=True )
 
@@ -102,6 +146,53 @@ class plot():
         labels = [(str(self.parameter_change2) + '=' + str(j)) for j in self.parameter_range2]
         fig.legend(lines, labels)
         plt.show()
+
+    def stoch_two_range_plot(self,parameter_change1,parameter_range1,parameter_change2,parameter_range2, compartments,time):
+            """
+            Plot of varying values of two parameters and plot the results of the compartments .
+
+            Parameter
+            -----------
+            Name of first parameter (str)
+            Varying values of this first parameter (list/array)
+            Name of second parameter (str)
+            Varying values of this second parameter (list/array)
+            Compartments which are shown in a plot for the different values (list)
+
+            """
+            self.time = time
+            self.compartments = compartments
+            self.parameter_change1 = parameter_change1
+            self.parameter_range1 = parameter_range1
+            self.parameter_change2 = parameter_change2
+            self.parameter_range2 = parameter_range2
+
+
+            results = {}
+            for i in self.parameter_range1:
+                results[i] = {}
+                for j in self.parameter_range2:
+                    results[i][j] = {}
+
+            for i in self.parameter_range1:
+                for j in self.parameter_range2:
+                    self.parameter.update({self.parameter_change1:i})
+                    self.parameter.update({self.parameter_change2:j})
+                    self.model.set_parameters(self.parameter)
+                    t,results[i][j] = self.model.compute(self.time)
+
+            fig, axs = plt.subplots(1,len(self.compartments),figsize = (len(compartments)*3,3), sharex=True, sharey=True )
+
+            for y in self.compartments:
+                for i in self.parameter_range1:
+                    for j in self.parameter_range2:
+                        axs[list(self.compartments).index(y)].plot(i,results[i][j][y].max(axis=0),'.', color = self.colors[list(self.parameter_range2).index(j)])
+                axs[list(self.compartments).index(y)].set_xlabel(self.parameter_change1)
+                axs[list(self.compartments).index(y)].set_ylabel(y)
+            lines = [Line2D([0], [0], color=self.colors[x], linewidth=3, linestyle='dotted') for x in range(len(self.parameter_range2))]
+            labels = [(str(self.parameter_change2) + '=' + str(j)) for j in self.parameter_range2]
+            fig.legend(lines, labels)
+            plt.show()
 if __name__=="__main__":
     N = 1000
     k0 = 2
