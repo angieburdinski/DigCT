@@ -353,6 +353,7 @@ class stoch_mixed_tracing():
         if self.quarantine_S_contacts == True:
             model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa'],self.N, self.edge_weight_tuples,directed=False)
             self.model = model
+
         else:
             model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa'],self.N,self.edge_weight_tuples,directed=False)
             self.model = model
@@ -507,6 +508,8 @@ class stoch_mixed_tracing():
                         ('Ta',p.chi,'Xa')])
         self.model.set_network(self.N,self.edge_weight_tuples)
         self.model.set_random_initial_conditions({ 'Sa' : Sa0,'S' : S0,'I_P':p.I_0})
+
+
 
 if __name__=="__main__":
     parameter = {

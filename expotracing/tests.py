@@ -11,7 +11,7 @@ colors = [i for i in color.keys()]
 
 def mixed_tracing_test():
     N = 10_000
-    t = np.linspace(0,1000,1000)
+    t = np.linspace(0,500,500)
     model = mixed_tracing(N,quarantine_S_contacts = True)
     parameter = {
             'R0': 2.5,
@@ -91,5 +91,3 @@ def stoch_mixed_tracing_test():
     labels = [('q = ' + str(j)) for j in q]
     fig.legend(lines, labels)
     plt.show()
-mixed_tracing_test()
-stoch_mixed_tracing_test()

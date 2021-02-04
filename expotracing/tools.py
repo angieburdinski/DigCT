@@ -3,6 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import exp
 import networkx as  nx
+import netwulf as nw
+import networkx as nx
+import epipack
+from epipack.vis import visualize
+from numpy import random
+class ParamDict(dict):
+    """
+
+    """
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+        self.__dict__ = self
+
 class configuration_network():
     """
     A Class to build a configuration network with an exponential degree
@@ -57,6 +70,74 @@ class configuration_network():
         G.remove_edges_from(nx.selfloop_edges(G))
 
         return G
+
+class vis_mixed_config():
+    def __init__(self,N,k0,t,parameter):
+        self.N = N
+        self.k0 = k0
+        self.G = configuration_network(self.N,self.k0).build()
+        self.t = t
+        self.edge_weight_tuples = [ (e[0], e[1], 1.0) for e in self.G.edges() ]
+        self.k_norm = 2*len(self.edge_weight_tuples) /self.N
+        self.model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa'],self.N, self.edge_weight_tuples,directed=False)
+        p = ParamDict(parameter)
+        kappa = (p.q*p.recovery_rate)/(1-p.q)
+        Sa0 = int(random.binomial(N-p.I_0, p.app_participation, 1))
+        S0 = int(N - p.I_0 - Sa0)
+        self.model.set_conditional_link_transmission_processes({
+
+                ("Ta", "->", "Xa") : [
+                        ("Xa", "I_Pa", p.z*p.y, "Xa", "Ta" ),
+                        ("Xa", "I_Sa", p.z*p.y, "Xa", "Ta" ),
+                        ("Xa", "I_Aa", p.z*p.y, "Xa", "Ta" ),
+                        ("Xa", "Ea", p.z*p.y, "Xa", "Ta" ),
+                        ("Xa", "Sa", p.z, "Xa", "Qa" ),
+                        ("Xa", "I_Pa", p.z*(1-p.y), "Xa", "Xa" ),
+                        ("Xa", "I_Sa", p.z*(1-p.y), "Xa", "Xa" ),
+                        ("Xa", "I_Aa", p.z*(1-p.y), "Xa", "Xa" ),
+                        ("Xa", "Ea", p.z*(1-p.y), "Xa", "Xa" )]
+
+                        })
+
+        self.model.set_link_transmission_processes([
+
+                    ('I_Pa','S',p.R0/self.k_norm*p.beta/2,'I_Pa','E'),
+                    ('I_Aa','S',p.R0/self.k_norm*p.recovery_rate/2,'I_Aa','E'),
+                    ('I_Sa','S',p.R0/self.k_norm*p.recovery_rate/2,'I_Sa','E'),
+
+                    ('I_P','Sa',p.R0/self.k_norm*p.beta/2,'I_P','Ea'),
+                    ('I_A','Sa',p.R0/self.k_norm*p.recovery_rate/2,'I_A','Ea'),
+                    ('I_S','Sa',p.R0/self.k_norm*p.recovery_rate/2,'I_S','Ea'),
+
+                    ('I_Pa','Sa',p.R0/self.k_norm*p.beta/2,'I_Pa','Ea'),
+                    ('I_Aa','Sa',p.R0/self.k_norm*p.recovery_rate/2,'I_Aa','Ea'),
+                    ('I_Sa','Sa',p.R0/self.k_norm*p.recovery_rate/2,'I_Sa','Ea'),
+
+                    ('I_P','S',p.R0/self.k_norm*p.beta/2,'I_P','E'),
+                    ('I_A','S',p.R0/self.k_norm*p.recovery_rate/2,'I_A','E'),
+                    ('I_S','S',p.R0/self.k_norm*p.recovery_rate/2,'I_S','E')])
+
+        self.model.set_node_transition_processes([
+                    ('E',p.alpha,'I_P'),
+                    ('I_P',(1-p.x)*p.beta,'I_S'),
+                    ('I_P',p.x*p.beta,'I_A'),
+                    ('I_A',p.recovery_rate,'R'),
+                    ('I_S',p.recovery_rate,'R'),
+                    ('I_S',kappa,'T'),
+                    ('T',p.chi,'X'),
+                    ('Qa',p.omega,'Sa'),
+                    ('Ea',p.alpha,'I_Pa'),
+                    ('I_Pa',(1-p.x)*p.beta,'I_Sa'),
+                    ('I_Pa',p.x*p.beta,'I_Aa'),
+                    ('I_Aa',p.recovery_rate,'Ra'),
+                    ('I_Sa',p.recovery_rate,'Ra'),
+                    ('I_Sa',kappa,'Ta'),
+                    ('Ta',p.chi,'Xa')])
+
+        self.model.set_network(self.N,self.edge_weight_tuples)
+        self.model.set_random_initial_conditions({ 'Sa' : Sa0,'S' : S0,'I_P':p.I_0})
+        stylized_network, config = nw.visualize(self.G)
+        visualize(self.model, stylized_network, sampling_dt=0.1)
 
 class analysis():
     """
@@ -271,6 +352,7 @@ class analysis():
                     self.model.set_parameters(self.parameter)
                     t, results[i][j] = self.model.compute(self.time)
             return t, results
+
 
 
 if __name__=="__main__":
