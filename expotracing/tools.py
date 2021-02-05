@@ -8,6 +8,7 @@ import networkx as nx
 import epipack
 from epipack.vis import visualize
 from numpy import random
+
 class ParamDict(dict):
     """
 
