@@ -404,8 +404,12 @@ class stoch_mixed_tracing():
         """
         p = ParamDict(parameters)
         kappa = (p.q*p.recovery_rate)/(1-p.q)
+        IP0 = int((1-p.app_participation)*p.I_0)
+        IPa0 = p.I_0 - IP0
+
         Sa0 = int(random.binomial(self.N-p.I_0, p.app_participation, 1))
         S0 = int(self.N - p.I_0 - Sa0)
+
         if self.quarantine_S_contacts == True:
 
             self.model.set_conditional_link_transmission_processes({
@@ -507,7 +511,7 @@ class stoch_mixed_tracing():
                         ('I_Sa',kappa,'Ta'),
                         ('Ta',p.chi,'Xa')])
         self.model.set_network(self.N,self.edge_weight_tuples)
-        self.model.set_random_initial_conditions({ 'Sa' : Sa0,'S' : S0,'I_P':p.I_0})
+        self.model.set_random_initial_conditions({ 'Sa' : Sa0,'S' : S0,'I_P':IP0,'I_Pa':IPa0})
 
 
 
