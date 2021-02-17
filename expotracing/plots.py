@@ -1,7 +1,6 @@
 from extendedmodel import (first_generation_tracing,next_generation_tracing,mixed_tracing,stoch_mixed_tracing)
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import colors as mcolors
 from matplotlib.lines import Line2D
 import networkx as nx
 
@@ -11,8 +10,19 @@ class plot():
 
         self.model = model
         self.parameter = parameter
-        color =  dict(mcolors.TABLEAU_COLORS, **mcolors.CSS4_COLORS)
-        self.colors = [i for i in color.keys()]
+        self.colors = [
+        'dimgrey',
+        'lightcoral',
+        'skyblue',
+        'indianred',
+        'darkcyan',
+        'maroon',
+        'darkgoldenrod',
+        'navy',
+        'mediumvioletred',
+        'darkseagreen',
+        'crimson'
+        ]
 
     def basic(self,t):
         """
@@ -68,7 +78,7 @@ class plot():
         self.parameter_range = parameter_range
         self.compartments = compartments
         self.t = t
-        fig, axs = plt.subplots(1,len(compartments),figsize = (len(compartments)*3,3),sharex=True, sharey=True )
+        fig, axs = plt.subplots(1,len(compartments),figsize = (len(compartments)*6,3),sharex=True, sharey=True )
         results = {}
         for i in self.parameter_range:
             self.parameter.update({self.parameter_change:i})
@@ -204,14 +214,14 @@ class plot():
             labels = [(str(self.parameter_change2) + '=' + str(j)) for j in self.parameter_range2]
             fig.legend(lines, labels)
             plt.show()
-            
+
 if __name__=="__main__":
     N = 1000
     k0 = 2
-    G = nx.barabasi_albert_graph(N,k0)
+
     t=1000
 
-    model = stoch_mixed_tracing(G,quarantine_S_contacts = False)
+    model = mixed_tracing(N,quarantine_S_contacts = False)
     parameter = {
             'R0': 2.5,
             'q': 0.5,
