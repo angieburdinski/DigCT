@@ -522,8 +522,8 @@ if __name__=="__main__":
             'app_participation': 0.3,
             'chi':1/2.5,
             'recovery_rate' : 1/6,
-            'alpha' : 1/2,
-            'beta' : 1/2,
+            'alpha' : 1/2.5,
+            'beta' : 1/2.5,
             'number_of_contacts' : 6.3,
             'x':0.17,
             'y':0.1,
@@ -531,10 +531,10 @@ if __name__=="__main__":
             'I_0' : 10,
             'omega':1/10
             }
-    N = 100
-    k0 = 50
+    N = 10000
+    k0 = 19
     G = nx.barabasi_albert_graph(N,k0)
-    model = stoch_mixed_tracing(G,False)
+    model = stoch_mixed_tracing(G,True)
     model.set_parameters(parameter)
     t,result = model.compute(10000)
     print(t,result)

@@ -216,22 +216,21 @@ class plot():
             plt.show()
 
 if __name__=="__main__":
-    N = 1000
-    k0 = 2
+    N = 10_000
 
-    t=1000
+    t = np.linspace(0,150,600)
 
-    model = mixed_tracing(N,quarantine_S_contacts = False)
+    model = mixed_tracing(N,quarantine_S_contacts = True)
     parameter = {
             'R0': 2.5,
             'q': 0.5,
             'app_participation': 0.33,
-            'chi':1/2.5,
+            'chi':1,
             'recovery_rate' : 1/6,
-            'alpha' : 1/2,
-            'beta' : 1/2,
-            #'number_of_contacts' : 6.3*1/0.33,
-            'x':0.83,
+            'alpha' : 1/2.5,
+            'beta' : 1/2.5,
+            'number_of_contacts' : 6.3,
+            'x':0.17,
             'y':0.1,
             'z':0.64,
             'I_0' : 10,
@@ -240,6 +239,6 @@ if __name__=="__main__":
 
     q = [0,0.01,0.2,0.4,0.6,0.8]
     #number_of_contacts = np.linspace(0,100,50)
-    a = np.linspace(0,0.8,20)
+    a = np.linspace(0,1,11)
 
-    results = plot(model,parameter,t).two_range_plot('app_participation',a,'q',q,['Ra','Xa','R','X'])
+    results = plot(model,parameter).two_range_plot('app_participation',a,'q',q,['X','R'],t)

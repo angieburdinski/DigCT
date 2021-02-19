@@ -68,7 +68,8 @@ class configuration_network():
         G = nx.configuration_model(expected_degree_sequence)
         G = nx.Graph(G)
         G.remove_edges_from(nx.selfloop_edges(G))
-
+        print('average clustering'+str(nx.average_clustering(G)))
+        print('info'+str(nx.info(G)))
         return G
 
 class vis_mixed_config():
@@ -355,19 +356,22 @@ class analysis():
 
 
 
+
+
 if __name__=="__main__":
-    population_size = 80e6
+    population_size = 10_000
     t = np.linspace(0,365,1000)
     model = mixed_tracing(N = population_size,quarantine_S_contacts = False)
     parameter = {
             'R0': 2.5,
             'q': 0.5,
             'app_participation': 0.33,
+            #'chi':1,
             'chi':1/2.5,
             'recovery_rate' : 1/6,
             'alpha' : 1/2,
             'beta' : 1/2,
-            'number_of_contacts' : 6.3*1/0.33,
+            'number_of_contacts' : 6.3,
             'x':0.4,
             'y':0.1,
             'z':0.64,
@@ -376,7 +380,6 @@ if __name__=="__main__":
             }
 
     q = [0,0.01,0.2,0.4,0.6,0.8]
-    number_of_contacts = np.linspace(0,100,50)
-    #a = np.linspace(0,0.8,25)
+    a = np.linspace(0,0.8,25)
 
-    results = analysis(model,parameter,t).two_range_result('number_of_contacts',number_of_contacts,'q',q)
+    results = analysis(model,parameter).two_range_result('app_participation',a,'q',q,t)

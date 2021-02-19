@@ -6,6 +6,7 @@ import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 import numpy as np
 import networkx as nx
+from smallworld import get_smallworld_graph
 from labellines import labelLine, labelLines
 colors = [
 'dimgrey',
@@ -70,6 +71,7 @@ def mixed_tracing_test():
     labels = [('q = ' + str(j)) for j in q]
     fig.legend(lines, labels)
     plt.show()
+
 def stoch_mixed_tracing_test(r):
     fig, axs = plt.subplots(2,4,figsize = (40,8))
     N = 10000
@@ -160,18 +162,19 @@ def tim():
         ax[1].set_ylabel('fraction of individuals \n in app-participants')
         ax[1].set_xlabel('time [d]')
     plt.show()
+
 def confplotnew(meas):
-    N= 10_000
+    N= 10000
     k0 = 19
     time = 1000
     parameter = {
-            'R0': 2.0,
+            'R0': 2.5,
             'q': 0.5,
             'app_participation': 0.33,
-            'chi':1/2.35,
-            'recovery_rate' : 1/8,
-            'alpha' : 1/3,
-            'beta' : 1/2,
+            'chi':1/2.5,
+            'recovery_rate' : 1/6,
+            'alpha' : 1/2.5,
+            'beta' : 1/2.5,
             'number_of_contacts' : 6.3,
             'x':0.17,
             'y':0.1,
@@ -181,7 +184,7 @@ def confplotnew(meas):
             }
 
     q = [0,0.2,0.4,0.6,0.8]
-    a = np.linspace(0,0.8,50)
+    a = np.linspace(0,0.8,5)
 
     qresult = []
     isresult = []
@@ -214,7 +217,7 @@ def confplotnew(meas):
 
     for x in qresult:
         for j in x:
-            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.2)
+            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$R (t\rightarrow \infty)+X (t\rightarrow \infty)$')
@@ -225,7 +228,7 @@ def confplotnew(meas):
 
     for x in isresult:
         for j in x:
-            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.2)
+            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$I_{S_{max}}$')
@@ -236,7 +239,7 @@ def confplotnew(meas):
 
     for x in ipresult:
         for j in x:
-            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.2)
+            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$I_{P_{max}}$')
@@ -247,7 +250,7 @@ def confplotnew(meas):
 
     for x in iaresult:
         for j in x:
-            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.2)
+            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$I_{A_{max}}$')
@@ -258,7 +261,7 @@ def confplotnew(meas):
 
     for x in sqresult:
         for j in x:
-            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.2)
+            plt.plot(a, j, '-',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$Q_{max}$')
@@ -267,11 +270,105 @@ def confplotnew(meas):
     plt.legend(lines,labels, loc='best')
     plt.show()
 
-
 def mixplotnew():
     N = 10_000
     t = np.linspace(0,500,500)
     model = mixed_tracing(N,quarantine_S_contacts = True)
+    parameter = {
+            'R0': 2.5,
+            'q': 0.5,
+            'app_participation': 0.33,
+            #'chi':1,
+            'chi':1/2.5,
+            'recovery_rate' : 1/6,
+            'alpha' : 1/2.5,
+            'beta' : 1/2.5,
+            'number_of_contacts' : 6.3,
+            'x':0.17,
+            'y':0.1,
+            'z':0.64,
+            'I_0' : 10,
+            'omega':1/10
+            }
+    z = [0,0.1,0.3,0.5,0.7,0.9,1]
+    q = np.linspace(0,0.9,50)
+
+
+    result = analysis(model,parameter).two_range_result('q',q,'z',z,t)
+    q_res = []
+    for j in z:
+        q_res.append([(result[i][j]['R'].max(axis = 0)+result[i][j]['X'].max(axis = 0))/N for i in q])
+
+    for x in q_res:
+        plt.plot(q, x, '-',color = colors[q_res.index(x)],label= 'z = '+str(z[q_res.index(x)]))
+
+
+    plt.xlabel(r'$a$')
+    plt.ylabel(r'$R (t\rightarrow \infty)+X (t\rightarrow \infty)$')
+    labelLines(plt.gca().get_lines(),zorder=2.5)
+    #plt.savefig('RX')
+    plt.show()
+
+    ip_res = []
+    for j in z:
+        ip_res.append([(result[i][j]['I_P'].max(axis = 0))/N for i in q])
+
+    for x in ip_res:
+        plt.plot(q, x, '-',color = colors[ip_res.index(x)],label= 'z = '+str(z[ip_res.index(x)]))
+
+    plt.xlabel(r'$a$')
+    plt.ylabel(r'$I_{P_{max}}$')
+    labelLines(plt.gca().get_lines(),zorder=2.5)
+
+    #plt.savefig('I_Pmax')
+    plt.show()
+
+    is_res = []
+    for j in z:
+        is_res.append([(result[i][j]['I_S'].max(axis = 0))/N for i in q])
+
+    for x in is_res:
+        plt.plot(q, x, '-',color = colors[is_res.index(x)],label= 'z = '+str(z[is_res.index(x)]))
+
+    plt.xlabel(r'$q$')
+    plt.ylabel(r'$I_{S_{max}}$')
+    labelLines(plt.gca().get_lines(),zorder=2.5)
+
+    #plt.savefig('I_Smax')
+    plt.show()
+
+    ia_res = []
+    for j in z:
+        ia_res.append([(result[i][j]['I_A'].max(axis = 0))/N for i in q])
+
+    for x in ia_res:
+        plt.plot(q, x, '-',color = colors[ia_res.index(x)],label= 'z = '+str(z[ia_res.index(x)]))
+
+    plt.xlabel(r'$a$')
+    plt.ylabel(r'$I_{A_{max}}$')
+    labelLines(plt.gca().get_lines(),zorder=2.5)
+
+    #plt.savefig('I_Amax')
+    plt.show()
+
+
+    Q_res = []
+    for j in z:
+        Q_res.append([(result[i][j]['Q'].max(axis = 0))/N for i in q])
+
+    for x in Q_res:
+        plt.plot(q, x, '-',color = colors[Q_res.index(x)],label= 'z = '+str(z[q_res.index(x)]))
+
+    plt.xlabel(r'$a$')
+    plt.ylabel(r'$Q_{max}$')
+    labelLines(plt.gca().get_lines(),zorder=2.5)
+    #plt.savefig('Q')
+    plt.show()
+
+def swstoch(meas):
+    N= 10_000
+    #k0 = 20
+    time = 1000
     parameter = {
             'R0': 2.5,
             'q': 0.5,
@@ -287,90 +384,112 @@ def mixplotnew():
             'I_0' : 10,
             'omega':1/10
             }
-    q = [0,0.2,0.4,0.6,0.8]
-    a = np.linspace(0,0.8,50)
 
+    q = [0,0.2,0.4]
+    a = np.linspace(0,0.8,20)
 
-    result = analysis(model,parameter).two_range_result('app_participation',a,'q',q,t)
-    q_res = []
-    for j in q:
-        q_res.append([(result[i][j]['R'].max(axis = 0)+result[i][j]['X'].max(axis = 0))/N for i in a])
+    qresult = []
+    isresult = []
+    iaresult = []
+    ipresult =[]
+    sqresult = []
+    #meas = 20
+    k_over_2 = 10
+    beta = 10e-6
+    for w in range(meas):
+        G = get_smallworld_graph(N,k_over_2,beta)
+        #G = nx.barabasi_albert_graph(N,10)
+        #G = configuration_network(N,k0).build()
+        model = stoch_mixed_tracing(G,quarantine_S_contacts = True)
+        t,result = analysis(model,parameter).stoch_two_range_result('app_participation',a,'q',q,time)
 
-    for x in q_res:
-        plt.plot(a, x, '-',color = colors[q_res.index(x)],label= 'q = '+str(q[q_res.index(x)]))
+        q_res = []
+        is_res = []
+        ia_res = []
+        ip_res = []
+        sq_res = []
+        for j in q:
+            q_res.append([(result[i][j]['R'].max(axis = 0)+result[i][j]['Ra'].max(axis = 0)+result[i][j]['X'].max(axis = 0)+result[i][j]['Xa'].max(axis = 0))/N for i in a])
+            is_res.append([(result[i][j]['I_S'].max(axis = 0)+result[i][j]['I_Sa'].max(axis = 0))/N for i in a])
+            ia_res.append([(result[i][j]['I_A'].max(axis = 0)+result[i][j]['I_Aa'].max(axis = 0))/N for i in a])
+            ip_res.append([(result[i][j]['I_P'].max(axis = 0)+result[i][j]['I_Pa'].max(axis = 0))/N for i in a])
+            sq_res.append([(result[i][j]['Qa'].max(axis = 0))/N for i in a])
 
+        qresult.append(q_res)
+        isresult.append(is_res)
+        iaresult.append(ia_res)
+        ipresult.append(ip_res)
+        sqresult.append(sq_res)
+
+    for x in qresult:
+        for j in x:
+            plt.plot(a, j, '.',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$R (t\rightarrow \infty)+X (t\rightarrow \infty)$')
-    labelLines(plt.gca().get_lines(),zorder=2.5)
-    plt.savefig('RX')
+    labels = ['q = '+str(i) for i in q]
+    lines = [Line2D([0], [0], color=c, linewidth=3, linestyle='dotted') for c in colors]
+    plt.legend(lines,labels, loc='best')
+    plt.savefig('SW_RX')
     plt.show()
 
-    ip_res = []
-    for j in q:
-        ip_res.append([(result[i][j]['I_P'].max(axis = 0))/N for i in a])
-
-    for x in ip_res:
-        plt.plot(a, x, '-',color = colors[ip_res.index(x)],label= 'q = '+str(q[ip_res.index(x)]))
-
-    plt.xlabel(r'$a$')
-    plt.ylabel(r'$I_{P_{max}}$')
-    labelLines(plt.gca().get_lines(),zorder=2.5)
-
-    plt.savefig('I_Pmax')
-    plt.show()
-
-    is_res = []
-    for j in q:
-        is_res.append([(result[i][j]['I_S'].max(axis = 0))/N for i in a])
-
-    for x in is_res:
-        plt.plot(a, x, '-',color = colors[is_res.index(x)],label= 'q = '+str(q[is_res.index(x)]))
+    for x in isresult:
+        for j in x:
+            plt.plot(a, j, '.',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$I_{S_{max}}$')
-    labelLines(plt.gca().get_lines(),zorder=2.5)
-
-    plt.savefig('I_Smax')
+    labels = ['q = '+str(i) for i in q]
+    lines = [Line2D([0], [0], color=c, linewidth=3, linestyle='dotted') for c in colors]
+    plt.legend(lines,labels, loc='best')
+    plt.savefig('SW_IS')
     plt.show()
 
-    ia_res = []
-    for j in q:
-        ia_res.append([(result[i][j]['I_A'].max(axis = 0))/N for i in a])
+    for x in ipresult:
+        for j in x:
+            plt.plot(a, j, '.',color = colors[x.index(j)],alpha = 0.5)
 
-    for x in ia_res:
-        plt.plot(a, x, '-',color = colors[ia_res.index(x)],label= 'q = '+str(q[ia_res.index(x)]))
+    plt.xlabel(r'$a$')
+    plt.ylabel(r'$I_{P_{max}}$')
+    labels = ['q = '+str(i) for i in q]
+    lines = [Line2D([0], [0], color=c, linewidth=3, linestyle='dotted') for c in colors]
+    plt.legend(lines,labels, loc='best')
+    plt.savefig('SW_IP')
+    plt.show()
+
+    for x in iaresult:
+        for j in x:
+            plt.plot(a, j, '.',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$I_{A_{max}}$')
-    labelLines(plt.gca().get_lines(),zorder=2.5)
-
-    plt.savefig('I_Amax')
+    labels = ['q = '+str(i) for i in q]
+    lines = [Line2D([0], [0], color=c, linewidth=3, linestyle='dotted') for c in colors]
+    plt.legend(lines,labels, loc='best')
+    plt.savefig('SW_IA')
     plt.show()
 
-
-    Q_res = []
-    for j in q:
-        Q_res.append([(result[i][j]['Q'].max(axis = 0))/N for i in a])
-
-    for x in Q_res:
-        plt.plot(a, x, '-',color = colors[Q_res.index(x)],label= 'q = '+str(q[Q_res.index(x)]))
+    for x in sqresult:
+        for j in x:
+            plt.plot(a, j, '.',color = colors[x.index(j)],alpha = 0.5)
 
     plt.xlabel(r'$a$')
     plt.ylabel(r'$Q_{max}$')
-    labelLines(plt.gca().get_lines(),zorder=2.5)
-    plt.savefig('Q')
+    labels = ['q = '+str(i) for i in q]
+    lines = [Line2D([0], [0], color=c, linewidth=3, linestyle='dotted') for c in colors]
+    plt.legend(lines,labels, loc='best')
+    plt.savefig('SW_Q')
     plt.show()
 
-#confplotnew(1)
 
 N = 10_000
-t = np.linspace(0,150,500)
+t = np.linspace(0,150,600)
 model = mixed_tracing(N,quarantine_S_contacts = True)
 parameter = {
         'R0': 2.5,
         'q': 0.5,
         'app_participation': 0.33,
+        #'chi':1,
         'chi':1/2.5,
         'recovery_rate' : 1/6,
         'alpha' : 1/2.5,
@@ -382,5 +501,11 @@ parameter = {
         'I_0' : 10,
         'omega':1/10
         }
-R0 = np.linspace(0,10,11)
-plot(model,parameter).range_plot('R0', R0, ['R','X','Q','T'] ,t)
+parameter.update({'y':1})
+parameter.update({'z':1})
+#parameter.update({'chi':1})
+parameter.update({'app_participation':0.8})
+
+#I0 = [1,10,100,1000]
+q = np.linspace(0,0.9,10)
+plot(model,parameter).range_plot('q',q,['I_S','I_P'],t)
