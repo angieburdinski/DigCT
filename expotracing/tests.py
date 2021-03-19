@@ -8,6 +8,7 @@ import numpy as np
 import networkx as nx
 from smallworld import get_smallworld_graph
 from labellines import labelLine, labelLines
+plt.rcParams.update({'font.size': 12})
 colors = [
 'dimgrey',
 'lightcoral',
@@ -483,8 +484,8 @@ def swstoch(meas):
 
 
 N = 10_000
-t = np.linspace(0,150,600)
-model = mixed_tracing(N,quarantine_S_contacts = True)
+t = np.linspace(0,300,400)
+model = mixed_tracing(N,quarantine_S_contacts = False)
 parameter = {
         'R0': 2.5,
         'q': 0.5,
@@ -501,11 +502,65 @@ parameter = {
         'I_0' : 10,
         'omega':1/10
         }
-parameter.update({'y':1})
-parameter.update({'z':1})
+#parameter.update({'y':1})
+#parameter.update({'z':1})
 #parameter.update({'chi':1})
-parameter.update({'app_participation':0.8})
+#parameter.update({'app_participation':0.8})
 
 #I0 = [1,10,100,1000]
-q = np.linspace(0,0.9,10)
-plot(model,parameter).range_plot('q',q,['I_S','I_P'],t)
+q = list(np.linspace(0.1,0.9,5))
+#plot(model,parameter).range_plot('q',q,['I_P','I_S'],t)
+
+
+result = analysis(model,parameter).range_result('q',q,t)
+for i in q:
+    #print(i,result[i]['R'].max(axis = 0))
+    plt.plot(t,(result[i]['R']+result[i]['X']),label='q = '+str(i),color = colors[q.index(i)])
+plt.xlabel('time')
+plt.ylim(0,10_000)
+plt.legend()
+plt.ylabel('RX')
+plt.show()
+
+parameter.update({'y':1})
+parameter.update({'z':1})
+result1 = analysis(model,parameter).range_result('q',q,t)
+for i in q:
+    #print(i,result[i]['R'].max(axis = 0))
+    plt.plot(t,(result1[i]['R']+result1[i]['X']),label='q = '+str(i),color = colors[q.index(i)])
+plt.xlabel('time')
+plt.ylim(0,10_000)
+plt.show()
+
+parameter.update({'y':1})
+parameter.update({'z':1})
+parameter.update({'chi':1})
+result2 = analysis(model,parameter).range_result('q',q,t)
+for i in q:
+    #print(i,result[i]['R'].max(axis = 0))
+    plt.plot(t,(result2[i]['R']+result2[i]['X']),label='q = '+str(i),color = colors[q.index(i)])
+plt.xlabel('time')
+plt.ylim(0,10_000)
+plt.show()
+
+parameter.update({'y':1})
+parameter.update({'z':1})
+parameter.update({'chi':1})
+parameter.update({'app_participation':0.8})
+result3 = analysis(model,parameter).range_result('q',q,t)
+for i in q:
+    #print(i,result[i]['R'].max(axis = 0))
+    plt.plot(t,(result3[i]['R']+result3[i]['X']),label='q = '+str(i),color = colors[q.index(i)])
+plt.xlabel('time')
+plt.ylim(0,10_000)
+plt.show()
+
+
+parameter.update({'app_participation':0})
+result0 = analysis(model,parameter).range_result('q',q,t)
+for i in q:
+    #print(i,result[i]['R'].max(axis = 0))
+    plt.plot(t,(result0[i]['R']+result0[i]['X']),label='q = '+str(i),color = colors[q.index(i)])
+plt.xlabel('time')
+plt.ylim(0,10_000)
+plt.show()

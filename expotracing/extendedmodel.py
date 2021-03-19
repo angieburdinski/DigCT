@@ -300,8 +300,8 @@ class mixed_tracing():
         else:
             self.model.set_processes([
                         ('S','I_P',p.R0*p.beta/2,'E','I_P'),
-                        ('S','I_A',p.R0*p.recovery_rate/4,'E','I_A'),
-                        ('S','I_S',p.R0*p.recovery_rate/4,'E','I_S'),
+                        ('S','I_A',p.R0*p.recovery_rate/2,'E','I_A'),
+                        ('S','I_S',p.R0*p.recovery_rate/2,'E','I_S'),
                         ('E',p.alpha,'I_P'),
                         ('I_P',(1-p.x)*p.beta,'I_S'),
                         ('I_P',p.x*p.beta,'I_A'),
