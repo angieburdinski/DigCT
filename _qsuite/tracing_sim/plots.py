@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib.lines import Line2D
 import gzip
 import qsuite_config as cf
-data = pickle.load(gzip.open('/Users/angeliqueburdinski/Desktop/Arbeit/tracing_sim/results_sw_NMEAS_100_ONLYSAVETIME_False/results.p.gz','rb'))
+data = pickle.load(gzip.open('/Users/angeliqueburdinski/expotracing/_qsuite/tracing_sim/results_sw_NMEAS_100_ONLYSAVETIME_False/results.p.gz','rb'))
 data = np.array(data)
 colors = [
         'dimgrey',
@@ -79,8 +79,6 @@ def sw_plot():
     plt.savefig(str(int(cf.parameter['R0']))+'_SW_Is_'+str(cf.N))
     plt.show()
 
-
-
 def config_plot():
     #colors = colors[0:len(cf.q)]
     for i in range(len(data)):
@@ -112,4 +110,4 @@ def config_plot():
     plt.ylabel(r'$R (t\rightarrow \infty)+X (t\rightarrow \infty)$',**hfont)
     plt.show()
 
-sw_plot()
+config_plot()

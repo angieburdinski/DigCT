@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib.lines import Line2D
 import gzip
 import qsuite_config as cf
-data = pickle.load(gzip.open('/Users/angeliqueburdinski/Desktop/Arbeit/tracing_sim/results_exp_NMEAS_100_ONLYSAVETIME_False/results.p.gz','rb'))
+data = pickle.load(gzip.open('/Users/angeliqueburdinski/expotracing/_qsuite/tracing_sim/results_exp_NMEAS_100_ONLYSAVETIME_False/results.p.gz','rb'))
 data = np.array(data)
 colors = [
         'dimgrey',
@@ -159,14 +159,20 @@ def darkfactor():
     plt.savefig('exp DF R0 = 2_5 z = 0_64')
     plt.show()
 def RX():
-    RX = []
+    RX01 = []
+    RX00 = []
     for x in range(len(cf.q)):
-        RX.append((data[:,0,0,:,x,2] + data[:,0,0,:,x,3]+data[:,0,0,:,x,4] + data[:,0,0,:,x,5]+data[:,0,0,:,x,6])/200_000)
-    meanRX = np.mean(RX,axis = 1)
-    standard_devRX = np.std(RX,axis = 1)
+        RX01.append((data[:,0,1,:,x,2] + data[:,0,1,:,x,3]+data[:,0,1,:,x,4] + data[:,0,1,:,x,5]+data[:,0,1,:,x,6])/200_000)
+        RX00.append((data[:,0,0,:,x,2] + data[:,0,0,:,x,3]+data[:,0,0,:,x,4] + data[:,0,0,:,x,5]+data[:,0,0,:,x,6])/200_000)
+    meanRX01 = np.mean(RX01,axis = 1)
+    standard_devRX01 = np.std(RX01,axis = 1)
+    meanRX00 = np.mean(RX00,axis = 1)
+    standard_devRX00 = np.std(RX00,axis = 1)
     for x in range(6):
-        plt.plot(meanRX[x],lw = 1.5, alpha = 1.5, color = colors[x])
-        plt.fill_between(range(25),meanRX[x]-standard_devRX[x], meanRX[x]+standard_devRX[x], alpha = 0.5,color = colors[x])
+        plt.plot(meanRX01[x], alpha = 1, color = colors[x])
+        plt.plot(meanRX00[x], alpha = 0.7, color = colors[x])
+        plt.fill_between(range(25),meanRX01[x]-standard_devRX01[x], meanRX01[x]+standard_devRX01[x], alpha = 0.7,color = colors[x])
+        plt.fill_between(range(25),meanRX00[x]-standard_devRX00[x], meanRX00[x]+standard_devRX00[x], alpha = 0.3,color = colors[x])
     positions = (0, 6, 12, 18, 24)
     labels = ('0',"0.25","0.5", "0.75",'1.0')
     plt.xticks(positions, labels)
@@ -176,6 +182,46 @@ def RX():
     plt.ylabel(r'$R(t \rightarrow \infty)+X(t \rightarrow \infty)$')
     plt.ylim(0,0.8)
     plt.xlabel(r'$a$',**hfont)
-    #plt.savefig('exp RX R0 = 2_5 z = 0_32',dpi = 300)
+    plt.savefig('expRX R0 = 2_5',dpi = 300)
     plt.show()
-RX()
+dcolors = [
+        'black',
+        'brown',
+        'steelblue',
+        'maroon',
+        'darkslategrey',
+        'saddlebrown',
+        'olive',
+        'midnightblue',
+        'darkmagenta',
+        'darkolivegreen',
+        'firebrick'
+        ]
+def RX_new():
+    RX01 = []
+    #RX00 = []
+    for x in range(len(cf.q)):
+        RX01.append(((data[:,0,1,:,x,2] + data[:,0,1,:,x,3]+data[:,0,1,:,x,4] + data[:,0,1,:,x,5]+data[:,0,1,:,0,6])/200_000))
+        #RX00.append((data[:,0,0,:,x,2] + data[:,0,0,:,x,3]+data[:,0,0,:,x,4] + data[:,0,0,:,x,5]+data[:,0,0,:,x,6])/200_000)
+    meanRX01 = np.mean(RX01,axis = 1)
+    #tandard_devRX01 = np.std(RX01,axis = 1)
+    #meanRX00 = np.mean(RX00,axis = 1)
+    #standard_devRX00 = np.std(RX00,axis = 1)
+    for x in range(6):
+        plt.plot((meanRX01[x]/meanRX01[x][0]-1)*100, alpha = 1, color = dcolors[x])
+        #plt.plot(meanRX00[x], alpha = 0.7, color = lcolors[x])
+        #plt.fill_between(range(25),(meanRX01[x]/meanRX01[x][0]-1)*100-standard_devRX01[x], (meanRX01[x]/meanRX01[x][0]-1)*100+standard_devRX01[x], alpha = 0.7,color = dcolors[x])
+        #plt.fill_between(range(25),meanRX00[x]-standard_devRX00[x], meanRX00[x]+standard_devRX00[x], alpha = 0.3,color = lcolors[x])
+    positions = (0, 6, 12, 18, 24)
+    labels = ('0',"0.25","0.5", "0.75",'1.0')
+    plt.xticks(positions, labels)
+    lines = [Line2D([0], [0], color = dcolors[x], linewidth=3, linestyle='-') for x in range(len(cf.q))]
+    labels = ['q = 0','q = 0.1','q = 0.3','q = 0.5','q = 0.7','q = 0.9']
+    plt.legend(lines, labels)
+    plt.ylabel(r'reduction of $RX_{max}$ to $RX_{max}(a = 0)$')
+    plt.ylim(-85,0)
+    #plt.vlines(8,meanRX01[2][8],meanRX01[3][8])
+    plt.xlabel(r'$a$',**hfont)
+    plt.savefig('expredRX',dpi = 300)
+    plt.show()
+RX_new()

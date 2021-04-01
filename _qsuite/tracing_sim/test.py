@@ -50,10 +50,11 @@ def confignetwork(N,**kwargs):
     print(nx.average_shortest_path_length(G))
 def expodegree(x):
     return 1/k0*exp(-x/k0)
-k0 = 20
-x = [i for i in range(200000)]
-y = [expodegree(i) for i in range(200000)]
-plt.plot(x,y,color = 'k',ls = 'solid')
-plt.yscale('log')
-plt.xscale('log')
-plt.show()
+#k0 = 20
+#x = [i for i in range(200000)]
+#y = [expodegree(i) for i in range(200000)]
+#plt.plot(x,y,color = 'k',ls = 'solid')
+#plt.yscale('log')
+#plt.xscale('log')
+#plt.show()
+print(np.linspace(0,1,25))
