@@ -6,7 +6,7 @@ from numpy import random
 import networkx as nx
 #=========== SIMULATION DETAILS ========
 projectname = "tracing"
-basename = "sw_noQ"
+basename = "exp_noQ"
 
 seed = -1
 N_measurements = 100

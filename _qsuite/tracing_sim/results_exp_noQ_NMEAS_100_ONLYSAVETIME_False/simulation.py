@@ -66,8 +66,8 @@ def simulation_code(kwargs):
 
         p = parameter
 
-        #edge_weight_tuples, k_norm = confignetwork(N,parameter)
-        edge_weight_tuples, k_norm = swnetwork(N,parameter)
+        edge_weight_tuples, k_norm = confignetwork(N,parameter)
+        #edge_weight_tuples, k_norm = swnetwork(N,parameter)
         kappa = (q*p['recovery_rate'])/(1-q)
 
         IPa0 = int(random.binomial(p['I_0'], a, 1))
