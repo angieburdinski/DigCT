@@ -5,9 +5,9 @@ from bfmplot import pl as pl
 import bfmplot as bp
 import numpy as np
 from smallworld import get_smallworld_graph
-N = 10001
+N = 200_001
 betas = np.logspace(-15,0,50, endpoint = False)
-k_over_2 = 25
+k_over_2 = 5
 x = [expected_clustering(N,k_over_2,beta) for beta in betas]
 y = [1/get_effective_medium_eigenvalue_gap(N,k_over_2,beta) for beta in betas]
 fig, ax1 = pl.subplots()

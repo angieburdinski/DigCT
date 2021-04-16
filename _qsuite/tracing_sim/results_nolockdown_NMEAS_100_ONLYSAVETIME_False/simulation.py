@@ -52,8 +52,8 @@ def swnetwork(N, parameter,**kwargs):
     #beta = 10e-4 #for k = 50, N = 10_000
     #beta = 10e-5 #for k = 20, N = 10_000
     #beta = 10e-6 #for k = 20, N = 20_000
-    beta = 10e-7 #for k = 20, N = 200_000 or k0=10
-    #beta = 1
+    #beta = 10e-7 #for k = 20, N = 200_000
+    beta = 1
     G = get_smallworld_graph(N,k_over_2,beta)
     edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
     k_norm = 2*len(edge_weight_tuples) / N
@@ -112,21 +112,21 @@ def simulation_code(kwargs):
 
         model.set_link_transmission_processes([
 
-                    ('I_Pa','S',R0/k_norm/2*p['beta']/2,'I_Pa','E'),
-                    ('I_Aa','S',R0/k_norm/2*p['recovery_rate']/2,'I_Aa','E'),
-                    ('I_Sa','S',R0/k_norm/2*p['recovery_rate']/2,'I_Sa','E'),
+                    ('I_Pa','S',R0/k_norm*p['beta']/2,'I_Pa','E'),
+                    ('I_Aa','S',R0/k_norm*p['recovery_rate']/2,'I_Aa','E'),
+                    ('I_Sa','S',R0/k_norm*p['recovery_rate']/2,'I_Sa','E'),
 
-                    ('I_P','Sa',R0/k_norm/2*p['beta']/2,'I_P','Ea'),
-                    ('I_A','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_A','Ea'),
-                    ('I_S','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_S','Ea'),
+                    ('I_P','Sa',R0/k_norm*p['beta']/2,'I_P','Ea'),
+                    ('I_A','Sa',R0/k_norm*p['recovery_rate']/2,'I_A','Ea'),
+                    ('I_S','Sa',R0/k_norm*p['recovery_rate']/2,'I_S','Ea'),
 
-                    ('I_Pa','Sa',R0/k_norm/2*p['beta']/2,'I_Pa','Ea'),
-                    ('I_Aa','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_Aa','Ea'),
-                    ('I_Sa','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_Sa','Ea'),
+                    ('I_Pa','Sa',R0/k_norm*p['beta']/2,'I_Pa','Ea'),
+                    ('I_Aa','Sa',R0/k_norm*p['recovery_rate']/2,'I_Aa','Ea'),
+                    ('I_Sa','Sa',R0/k_norm*p['recovery_rate']/2,'I_Sa','Ea'),
 
-                    ('I_P','S',R0/k_norm/2*p['beta']/2,'I_P','E'),
-                    ('I_A','S',R0/k_norm/2*p['recovery_rate']/2,'I_A','E'),
-                    ('I_S','S',R0/k_norm/2*p['recovery_rate']/2,'I_S','E')])
+                    ('I_P','S',R0/k_norm*p['beta']/2,'I_P','E'),
+                    ('I_A','S',R0/k_norm*p['recovery_rate']/2,'I_A','E'),
+                    ('I_S','S',R0/k_norm*p['recovery_rate']/2,'I_S','E')])
 
         model.set_network(N, edge_weight_tuples)
 

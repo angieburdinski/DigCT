@@ -7,7 +7,7 @@ import networkx as nx
 from smallworld import get_smallworld_graph
 from SamplableSet import SamplableSet
 import matplotlib.pyplot as plt
-
+from collections import Counter
 def swnetwork(N, **kwargs):
     k_over_2 = 10
     beta = 10e-7
@@ -15,8 +15,9 @@ def swnetwork(N, **kwargs):
     print(nx.average_clustering(G))
     print(len(G.edges())/N)
     print(nx.average_shortest_path_length(G))
-def confignetwork(N,**kwargs):
-    k0 = 20
+    return G
+def confignetwork(N,k0,**kwargs):
+
     def expodegree(x):
         return 1/k0*exp(-x/k0)
 
@@ -43,18 +44,7 @@ def confignetwork(N,**kwargs):
     expected_degree_sequence = seq(k_i,P)
 
     G = nx.configuration_model(expected_degree_sequence,create_using = nx.Graph())
-    #G = nx.Graph(G)
     G.remove_edges_from(nx.selfloop_edges(G))
-    print(nx.average_clustering(G))
-    print(len(G.edges())/N)
-    print(nx.average_shortest_path_length(G))
-def expodegree(x):
-    return 1/k0*exp(-x/k0)
-#k0 = 20
-#x = [i for i in range(200000)]
-#y = [expodegree(i) for i in range(200000)]
-#plt.plot(x,y,color = 'k',ls = 'solid')
-#plt.yscale('log')
-#plt.xscale('log')
-#plt.show()
-print(np.linspace(0,1,25))
+    return G
+def degreelist(G):
+    print([G.degree(i) for i in range(200000)])

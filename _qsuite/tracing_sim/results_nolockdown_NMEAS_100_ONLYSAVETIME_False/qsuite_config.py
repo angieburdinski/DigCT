@@ -23,7 +23,7 @@ parameter = {
         'recovery_rate' : 1/7,
         'alpha' : 1/3,
         'beta' : 1/2,
-        'number_of_contacts' : 10,
+        'number_of_contacts' : 20,
         'x':0.17,
         'y':0.1,
         'I_0' : N*0.01,
