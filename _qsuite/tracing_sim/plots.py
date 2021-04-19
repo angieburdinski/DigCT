@@ -33,7 +33,35 @@ colors = [
         'darkseagreen',
         'crimson'
         ]
+def Figure1():
+    omega_exp = np.array([(exp[:,0,1,:,x,2] + exp[:,0,1,:,x,3]+exp[:,0,1,:,x,4] + exp[:,0,1,:,x,5]+exp[:,0,1,:,x,6])for x in range(len(cf.q))])
+    omega_sw = np.array([(sw[:,0,1,:,x,2]+sw[:,0,1,:,x,3]+sw[:,0,1,:,x,4] + sw[:,0,1,:,x,5]+sw[:,0,1,:,x,6]) for x in range(len(cf.q))])
+    omega_lockdown = np.array([(lockdown[:,0,0,:,x,2] + lockdown[:,0,0,:,x,3]+lockdown[:,0,0,:,x,4] + lockdown[:,0,0,:,x,5]+lockdown[:,0,0,:,x,6]) for x in range(len(cf.q))])
+    omega_no_lockdown = np.array([(no_lockdown[:,0,0,:,x,2] + no_lockdown[:,0,0,:,x,3]+no_lockdown[:,0,0,:,x,4] + no_lockdown[:,0,0,:,x,5]+no_lockdown[:,0,0,:,x,6]) for x in range(len(cf.q))])
+    mean_omega_lockdown = np.mean(omega_lockdown,axis = 1)/200_000
+    mean_omega_no_lockdown = np.mean(omega_no_lockdown,axis = 1)/200_000
+    mean_omegaexp = np.mean(omega_exp,axis = 1)/200_000
+    mean_omegasw = np.mean(omega_sw,axis = 1)/200_000
 
+
+
+    red_exp = [(((mean_omegaexp[x]/mean_omegaexp[x][0])-1)*100) for x in range(6)]
+    red_sw = [(((mean_omegasw[x]/mean_omegasw[x][0])-1)*100) for x in range(6)]
+    red_nolock = [(((mean_omega_no_lockdown[x]/mean_omega_no_lockdown[x][0])-1)*100) for x in range(6)]
+    red_lock = [(((mean_omega_lockdown[x]/mean_omega_lockdown[x][0])-1)*100) for x in range(6)]
+    plt.bar(0,red_exp[2][7],color = colors[0])
+    plt.bar(1,red_sw[2][7],color = colors[1])
+    plt.bar(2,red_nolock[2][7],color = colors[2])
+    plt.bar(3,red_lock[2][7],color = colors[3])
+    lines = [Line2D([0], [0],color = colors[x], linewidth=5, linestyle='-') for x in range(4)]
+    labels = ['exponential','small world', 'nolockdown', 'lockdown']
+    plt.xticks([])
+    plt.legend(lines,labels)
+    plt.ylabel('outbreak size reduction [%]')
+    plt.show()
+
+
+Figure1()
 def Fig1():
     omega_sw = np.array([(sw[:,0,1,:,x,2]+sw[:,0,1,:,x,3]+sw[:,0,1,:,x,4] + sw[:,0,1,:,x,5]+sw[:,0,1,:,x,6]) for x in range(len(cf.q))])
     DF_sw = (omega_sw)/np.array([(sw[:,0,1,:,x,4] + sw[:,0,1,:,x,5]) for x in range(len(cf.q))])
@@ -100,16 +128,16 @@ def Fig2():
     a = [0,7,12,19]
 
     for x in a:
-        ax[0].bar(a.index(x),       mean_exp_RX[2][x],          alpha = 0.8, color = colors[0], lw = 1.5, width = 0.2)
-        ax[0].bar(a.index(x)+0.2,   mean_exp_noQ_RX[2][x],      alpha = 0.8, color = colors[1], lw = 1.5, width = 0.2)
-        ax[0].bar(a.index(x)+0.4,   mean_exp_low_eff_RX[2][x],  alpha = 0.8, color = colors[2], lw = 1.5, width = 0.2)
-        ax[1].bar(a.index(x),       mean_sw_RX[2][x],           alpha = 0.8, color = colors[0], lw = 1.5, width = 0.2)
-        ax[1].bar(a.index(x)+0.2,   mean_sw_noQ_RX[2][x],       alpha = 0.8, color = colors[1], lw = 1.5, width = 0.2)
-        ax[1].bar(a.index(x)+0.4,   mean_sw_low_eff_RX[2][x],   alpha = 0.8, color = colors[2], lw = 1.5, width = 0.2)
+        ax[0].bar(a.index(x),       mean_exp_RX[2][x],          alpha = 1, color = colors[0], lw = 1.5, width = 0.2)
+        ax[0].bar(a.index(x)+0.2,   mean_exp_noQ_RX[2][x],      alpha = 1, color = colors[1], lw = 1.5, width = 0.2)
+        ax[0].bar(a.index(x)+0.4,   mean_exp_low_eff_RX[2][x],  alpha = 1, color = colors[2], lw = 1.5, width = 0.2)
+        ax[1].bar(a.index(x),       mean_sw_RX[2][x],           alpha = 1, color = colors[0], lw = 1.5, width = 0.2)
+        ax[1].bar(a.index(x)+0.2,   mean_sw_noQ_RX[2][x],       alpha = 1, color = colors[1], lw = 1.5, width = 0.2)
+        ax[1].bar(a.index(x)+0.4,   mean_sw_low_eff_RX[2][x],   alpha = 1, color = colors[2], lw = 1.5, width = 0.2)
 
     positions = (0.1, 1.1, 2.1, 3.1)
     xlabels = ("0", "30", "50", "80")
-    lines = [Line2D([0], [0], color = colors[x], alpha = 0.5, linewidth=4, linestyle='-') for x in [0,1,2]]
+    lines = [Line2D([0], [0], color = colors[x], alpha = 1, linewidth=4, linestyle='-') for x in [0,1,2]]
     ylabels = ['base ','noQ','lower eff']
 
     for i in [0,1]:
@@ -120,6 +148,43 @@ def Fig2():
         ax[i].set_ylabel(r'outbreak size $\Omega$',**hfont)
         ax[i].legend(lines, ylabels)
     #plt.savefig('Fig2',dpi = 300)
+    plt.show()
+
+    fig, ((ax_1,ax_2,ax_3),(ax1,ax2,ax3)) = plt.subplots(2,3,figsize = (8,4))
+
+    e1 = [(((mean_exp_RX[x]/mean_exp_RX[x][0])-1)*100) for x in range(6)]
+    e2 = [(((mean_exp_noQ_RX[x]/mean_exp_noQ_RX[x][0])-1)*100) for x in range(6)]
+    e3 = [(((mean_exp_low_eff_RX[x]/mean_exp_low_eff_RX[x][0])-1)*100) for x in range(6)]
+    sw1 = [(((mean_sw_RX[x]/mean_sw_RX[x][0])-1)*100) for x in range(6)]
+    sw2 = [(((mean_sw_noQ_RX[x]/mean_sw_noQ_RX[x][0])-1)*100) for x in range(6)]
+    sw3 = [(((mean_sw_low_eff_RX[x]/mean_sw_low_eff_RX[x][0])-1)*100) for x in range(6)]
+    axlist = [ax_1,ax_2,ax_3,ax1,ax2,ax3]
+
+    o_ne = ax_1.imshow(e1, vmin=-80, vmax=0, aspect = 'auto',cmap='inferno')
+    t_wo = ax_2.imshow(e2, vmin=-80, vmax=0, aspect = 'auto',cmap='inferno')
+    t_hree = ax_3.imshow(e3, vmin=-80, vmax=0, aspect = 'auto',cmap='inferno')
+    one = ax1.imshow(sw1, vmin=-80, vmax=0, aspect = 'auto',cmap='inferno')
+    two = ax2.imshow(sw2, vmin=-80, vmax=0, aspect = 'auto',cmap='inferno')
+    three = ax3.imshow(sw3, vmin=-80, vmax=0, aspect = 'auto',cmap='inferno')
+
+    for i in [ax_1,ax1]:
+        i.set_yticks((0,1,2,3,4,5))
+        i.set_yticklabels((0,0.1,0.3,0.5,0.7,0.9))
+    for i in [ax_2,ax2,ax_3,ax3]:
+        i.set_yticks(())
+        i.set_yticklabels(())
+
+    for i in [ax1,ax2,ax3]:
+        i.set_xticks((0,6,12,18,24))
+        i.set_xticklabels((0,25,50,75,100))
+        i.set_xlabel('app participation')
+    for i in [ax_1,ax_2,ax_3]:
+        i.set_xticks(())
+        i.set_xticklabels(())
+        i.set_xlabel('')
+    cbar = plt.colorbar(three, ax=axlist)
+    cbar.set_label('     outbreak size reduction', rotation=270, labelpad=30,)
+
     plt.show()
 
 def Fig3():
@@ -199,29 +264,47 @@ def Fig5():
     mean_omega_lockdown = np.mean(omega_lockdown,axis = 1)/200_000
     mean_DF_no_lockdown = np.mean(DF_no_lockdown,axis = 1)
     mean_omega_no_lockdown = np.mean(omega_no_lockdown,axis = 1)/200_000
-    fig, ax = plt.subplots(2,2,figsize = (14,10))
-    for x in range(6):
-        ax[0,0].plot(mean_omega_no_lockdown[x],                                         alpha = 1, color = colors[x], lw = 1.5, marker = marker[x])
-        ax[0,1].plot(((mean_omega_no_lockdown[x]/mean_omega_no_lockdown[x][0])-1)*100,  alpha = 1, color = colors[x], lw = 1.5, marker = marker[x])
-        ax[1,0].plot(mean_omega_lockdown[x],                                            alpha = 1, color = colors[x], lw = 1.5, marker = marker[x])
-        ax[1,1].plot(((mean_omega_lockdown[x]/mean_omega_lockdown[x][0])-1)*100,        alpha = 1, color = colors[x], lw = 1.5, marker = marker[x])
+    #fig, ax = plt.subplots(2,2,figsize = (14,10))
+    #for x in range(6):
+    #    ax[0,0].plot(mean_omega_no_lockdown[x],                                         alpha = 1, color = colors[x], lw = 1.5, marker = marker[x])
+    #    ax[0,1].plot(((mean_omega_no_lockdown[x]/mean_omega_no_lockdown[x][0])-1)*100,  alpha = 1, color = colors[x], lw = 1.5, marker = marker[x])
+    #    ax[1,0].plot(mean_omega_lockdown[x],                                            alpha = 1, color = colors[x], lw = 1.5, marker = marker[x])
+    #    ax[1,1].plot(((mean_omega_lockdown[x]/mean_omega_lockdown[x][0])-1)*100,        alpha = 1, color = colors[x], lw = 1.5, marker = marker[x])
 
     positions = (0, 6, 12, 18, 24)
     xlabels = ('0',"25","50", "75",'100')
 
-    for i in [0,1]:
-        for j in [0,1]:
-            ax[j,i].set_xticks(positions)
-            ax[j,i].set_xticklabels(xlabels)
-            ax[j,i].set_xlabel(r'app participation $a$ [%]',**hfont)
-            ax[j,1].set_ylim(-85,5)
-            ax[j,0].set_ylabel(r'outbreak size $\Omega$ ',**hfont)
-            ax[j,1].set_ylabel(r'outbreak size reduction [%] ',**hfont)
+    #for i in [0,1]:
+    #    for j in [0,1]:
+    #        ax[j,i].set_xticks(positions)
+    #        ax[j,i].set_xticklabels(xlabels)
+    #        ax[j,i].set_xlabel(r'app participation $a$ [%]',**hfont)
+    #        ax[j,1].set_ylim(-85,5)
+    #        ax[j,0].set_ylabel(r'outbreak size $\Omega$ ',**hfont)
+    #        ax[j,1].set_ylabel(r'outbreak size reduction [%] ',**hfont)
 
     lines = [Line2D([0], [0], color = colors[x], marker = marker[x],linewidth=1.5, linestyle='-') for x in range(len(cf.q))]
     labels = ['q = 0','q = 0.1','q = 0.3','q = 0.5','q = 0.7','q = 0.9']
-    ax[1,1].legend(lines, labels)
+    #ax[1,1].legend(lines, labels)
     #plt.savefig('Fig5',dpi = 300)
+    #plt.show()
+    rel_red_no = [(((mean_omega_no_lockdown[x]/mean_omega_no_lockdown[x][0])-1)*100) for x in range(6)]
+    rel_red = [(((mean_omega_lockdown[x]/mean_omega_lockdown[x][0])-1)*100) for x in range(6)]
+    fig, (ax1,ax2) = plt.subplots(1,2,figsize = (8,4))
+
+    axlist = [ax1,ax2]
+
+    one = ax1.imshow(rel_red_no, vmin=-80, vmax=0, aspect = 'auto',cmap='inferno')
+    two = ax2.imshow(rel_red, vmin=-80, vmax=0, aspect = 'auto',cmap='inferno')
+    for i in axlist:
+        i.set_xticks(positions)
+        i.set_xticklabels(xlabels)
+        i.set_yticks((0,1,2,3,4,5))
+        i.set_yticklabels((0,10,30,50,70,90))
+        i.set_xlabel('app participation [%]')
+        i.set_ylabel('individuals found by symptom based testing [%]')
+    cbar = plt.colorbar(one, ax=axlist)
+    cbar.set_label('outbreaksize reduction [%]', rotation=270,labelpad = 30)
     plt.show()
 
 def infectious():
@@ -258,4 +341,3 @@ def infectious():
     ax[0].legend(lines, labels)
     #plt.savefig('Fig6',dpi = 300)
     plt.show()
-infectious()

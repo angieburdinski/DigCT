@@ -8,7 +8,7 @@ from smallworld import get_smallworld_graph
 import matplotlib.pyplot as plt
 N = 200_000
 q = 0.3
-a = 0.3
+a =  0.3
 R0 = 2.5
 z = 0.64
 parameter = {
@@ -16,37 +16,63 @@ parameter = {
         'recovery_rate' : 1/7,
         'alpha' : 1/3,
         'beta' : 1/2,
-        'number_of_contacts' : 10,
+        'number_of_contacts' : 20,
         'x':0.17,
         'y':0.1,
         'I_0' : N*0.01,
         'omega':1/10
         }
 
-sampling_dt = 1
+sampling_dt = 0.5
 time = 10e6
 
-def swnetwork(N, parameter,**kwargs):
+def confignetwork(N, parameter,**kwargs):
     p = parameter
-    k_over_2 = int(p['number_of_contacts']/2)
-    #beta = 10e-4 #for k = 50, N = 10_000
-    #beta = 10e-5 #for k = 20, N = 10_000
-    #beta = 10e-6 #for k = 20, N = 20_000
-    beta = 10e-7 #for k = 20, N = 200_000 or k0=10
-    #beta = 1
-    G = get_smallworld_graph(N,k_over_2,beta)
+    k0 = p['number_of_contacts']
+    def expodegree(x):
+        return 1/k0*exp(-x/k0)
+
+    P = []
+    k_i = []
+    for i in range(N-1):
+        p_k = expodegree(i)
+        P.append(p_k)
+        k_i.append(i)
+    P = np.array(P)
+    P /= P.sum()
+
+    def seq(k_i,P):
+        expected_degree_sequence = np.linspace(0,1,2)
+        while sum(expected_degree_sequence) % 2 != 0:
+            expected_degree_sequence = np.random.choice(
+              k_i,
+              N,
+              p = P
+            )
+
+        return expected_degree_sequence
+
+    expected_degree_sequence = seq(k_i,P)
+
+    G = nx.configuration_model(expected_degree_sequence,create_using = nx.Graph())
+    #G = nx.Graph(G)
+    G.remove_edges_from(nx.selfloop_edges(G))
+
     edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
+
     k_norm = 2*len(edge_weight_tuples) / N
+    #print(G.nodes())
     del G
     print(k_norm)
     return edge_weight_tuples, k_norm
+
 
 def mixed(N, parameter, time, sampling_dt, a, q,z, R0, **kwargs):
 
     p = parameter
 
-    #edge_weight_tuples, k_norm = confignetwork(N,parameter)
-    edge_weight_tuples, k_norm = swnetwork(N,parameter)
+    edge_weight_tuples, k_norm = confignetwork(N,parameter)
+    #edge_weight_tuples, k_norm = swnetwork(N,parameter)
     kappa = (q*p['recovery_rate'])/(1-q)
 
     IPa0 = int(random.binomial(p['I_0'], a, 1))
@@ -90,21 +116,21 @@ def mixed(N, parameter, time, sampling_dt, a, q,z, R0, **kwargs):
 
     model.set_link_transmission_processes([
 
-                ('I_Pa','S',R0/k_norm/2*p['beta']/2,'I_Pa','E'),
-                ('I_Aa','S',R0/k_norm/2*p['recovery_rate']/2,'I_Aa','E'),
-                ('I_Sa','S',R0/k_norm/2*p['recovery_rate']/2,'I_Sa','E'),
+                ('I_Pa','S',R0/k_norm*p['beta']/2,'I_Pa','E'),
+                ('I_Aa','S',R0/k_norm*p['recovery_rate']/2,'I_Aa','E'),
+                ('I_Sa','S',R0/k_norm*p['recovery_rate']/2,'I_Sa','E'),
 
-                ('I_P','Sa',R0/k_norm/2*p['beta']/2,'I_P','Ea'),
-                ('I_A','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_A','Ea'),
-                ('I_S','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_S','Ea'),
+                ('I_P','Sa',R0/k_norm*p['beta']/2,'I_P','Ea'),
+                ('I_A','Sa',R0/k_norm*p['recovery_rate']/2,'I_A','Ea'),
+                ('I_S','Sa',R0/k_norm*p['recovery_rate']/2,'I_S','Ea'),
 
-                ('I_Pa','Sa',R0/k_norm/2*p['beta']/2,'I_Pa','Ea'),
-                ('I_Aa','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_Aa','Ea'),
-                ('I_Sa','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_Sa','Ea'),
+                ('I_Pa','Sa',R0/k_norm*p['beta']/2,'I_Pa','Ea'),
+                ('I_Aa','Sa',R0/k_norm*p['recovery_rate']/2,'I_Aa','Ea'),
+                ('I_Sa','Sa',R0/k_norm*p['recovery_rate']/2,'I_Sa','Ea'),
 
-                ('I_P','S',R0/k_norm/2*p['beta']/2,'I_P','E'),
-                ('I_A','S',R0/k_norm/2*p['recovery_rate']/2,'I_A','E'),
-                ('I_S','S',R0/k_norm/2*p['recovery_rate']/2,'I_S','E')])
+                ('I_P','S',R0/k_norm*p['beta']/2,'I_P','E'),
+                ('I_A','S',R0/k_norm*p['recovery_rate']/2,'I_A','E'),
+                ('I_S','S',R0/k_norm*p['recovery_rate']/2,'I_S','E')])
 
     model.set_network(N, edge_weight_tuples)
 
@@ -119,24 +145,12 @@ def mixed(N, parameter, time, sampling_dt, a, q,z, R0, **kwargs):
 
     t, result = model.simulate(tmax = time , sampling_dt = sampling_dt)
 
-    del model
-    #del t
-    del time
-    del sampling_dt
-
-    results = max(result['I_S']),max(result['I_Sa']),max(result['R']),max(result['Ra']),max(result['X']),max(result['Xa']),max(result['C'])
-
-    #del result
-
-    return t, result
-
-t, res = mixed(N, parameter, time, sampling_dt, a, q,z, R0,)
-#plt.plot(t,res['S']+res['Sa'])
-plt.plot(t,res['I_P']+res['I_Pa']+res['I_S']+res['I_Sa']+res['I_A']+res['I_Aa'], label = 'I')
-plt.plot(t,res['R']+res['Ra'], label = 'R')
-plt.plot(t,res['X']+res['Xa'], label = 'X')
-plt.plot(t,res['T']+res['Ta'], label = 'T')
-plt.plot(t,res['C'], label = 'C')
-plt.legend()
-plt.yscale('log')
-plt.show()
+    return t, result['C'], result['R'], result['Ra'],result['X'],result['Xa']
+import csv
+with open('mixeda=30.csv', 'w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["t", "run_id","C", "R", "Ra", "X", "Xa"])
+    for i in range(20):
+        t, C, R, Ra,X,Xa = mixed(N, parameter, time, sampling_dt, a, q,z, R0,)
+        for j in range(len(t)):
+            writer.writerow([t[j], i, C[j], R[j], Ra[j],X[j],Xa[j]])

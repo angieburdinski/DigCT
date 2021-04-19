@@ -8,9 +8,13 @@ from smallworld import get_smallworld_graph
 from SamplableSet import SamplableSet
 import matplotlib.pyplot as plt
 from collections import Counter
+import networkx as nx
+import netwulf as nw
 def swnetwork(N, **kwargs):
+    #k_over_2 = 10
+    #beta = 10e-7
     k_over_2 = 10
-    beta = 10e-7
+    beta = 10e-3
     G = get_smallworld_graph(N,k_over_2,beta)
     print(nx.average_clustering(G))
     print(len(G.edges())/N)
@@ -48,3 +52,6 @@ def confignetwork(N,k0,**kwargs):
     return G
 def degreelist(G):
     print([G.degree(i) for i in range(200000)])
+
+G = confignetwork(100,20)
+stylized_network, config = nw.visualize(G)
