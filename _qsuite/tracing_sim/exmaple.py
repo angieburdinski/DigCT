@@ -147,10 +147,11 @@ def mixed(N, parameter, time, sampling_dt, a, q,z, R0, **kwargs):
 
     return t, result['C'], result['R'], result['Ra'],result['X'],result['Xa']
 import csv
-with open('mixeda=30.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow(["t", "run_id","C", "R", "Ra", "X", "Xa"])
-    for i in range(20):
-        t, C, R, Ra,X,Xa = mixed(N, parameter, time, sampling_dt, a, q,z, R0,)
-        for j in range(len(t)):
-            writer.writerow([t[j], i, C[j], R[j], Ra[j],X[j],Xa[j]])
+def csv():
+    with open('mixeda=30.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["t", "run_id","C", "R", "Ra", "X", "Xa"])
+        for i in range(20):
+            t, C, R, Ra,X,Xa = mixed(N, parameter, time, sampling_dt, a, q,z, R0,)
+            for j in range(len(t)):
+                writer.writerow([t[j], i, C[j], R[j], Ra[j],X[j],Xa[j]])

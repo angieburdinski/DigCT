@@ -6,7 +6,7 @@ import bfmplot as bp
 import numpy as np
 from smallworld import get_smallworld_graph
 #N = 200_001
-N = 1_001
+N = 10001
 betas = np.logspace(-10,0,50, endpoint = False)
 k_over_2 = 10
 x = [expected_clustering(N,k_over_2,beta) for beta in betas]

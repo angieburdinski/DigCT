@@ -10,15 +10,82 @@ import matplotlib.pyplot as plt
 from collections import Counter
 import networkx as nx
 import netwulf as nw
+from scipy.stats import expon
+import numpy as np
+import networkx as nx
+
+def _edge(i,j):
+    if i > j:
+        return (j,i)
+    elif j > i:
+        return (i,j)
+    else:
+        raise ValueError('self-loop')
+
+
+def get_expon_small_world(N,k0,more_lattice_like=False,node_creation_order='random'):
+
+    G = nx.empty_graph(N)
+
+    degree_seq = [ int(k) for k in expon.rvs(scale=k0,size=N)]
+    stubs = list(degree_seq)
+    if sum(stubs) % 2 == 1:
+        stubs[np.random.randint(0,N-1)] += 1
+
+    if node_creation_order == 'random':
+        # generates small world but locally clustered
+        order = np.random.permutation(N)
+    elif node_creation_order == 'desc':
+        # generates locally clustered
+        order = np.argsort(stubs)[::-1]
+    elif node_creation_order == 'asc':
+        # generates locally clustered with short paths
+        order = np.argsort(stubs)
+    else:
+        raise ValueError("`node_creation_order` must be 'random', 'desc', or 'asc', not " + node_creation_order)
+
+    edges = []
+    cnt = 0
+    for i in order:
+        d = 1
+        up = True
+        while stubs[i] > 0:
+            if up:
+                j = (i+d) % N
+            else:
+                j = (i-d) % N
+                d += 1
+            if i == j:
+                break
+            if stubs[j] > 0:#and not G.has_edge(i,j):
+                edges.append(_edge(int(i),int(j)))
+                #G.add_edge(i,j)
+                stubs[i] -= 1
+                stubs[j] -= 1
+            up = not up
+            if d >= N//2:
+                break
+            #f d > N // 2:
+            #    print(stubs[i], np.mean(stubs), np.min(stubs),np.max(stubs),cnt)
+            #    raise ValueError('Couldn''t find stub')
+        cnt += 1
+    #print("leftover stubs:",sum(stubs))
+    #print("number of nodes with leftover stubs:",np.count_nonzero(stubs))
+
+    #print("len(edges) = ", len(edges), "len(set(edges)) = ", len(set(edges)), "difference = ", len(edges) - len(set(edges)))
+    G.add_edges_from(edges)
+    print(nx.average_clustering(G))
+    return G,
+G = get_expon_small_world(200_000,20,more_lattice_like=False,node_creation_order='asc')    
 def swnetwork(N, **kwargs):
     #k_over_2 = 10
     #beta = 10e-7
     k_over_2 = 10
-    beta = 10e-3
+    beta=1
+    #beta = 10e-3
+
     G = get_smallworld_graph(N,k_over_2,beta)
-    print(nx.average_clustering(G))
-    print(len(G.edges())/N)
-    print(nx.average_shortest_path_length(G))
+
     return G
 def confignetwork(N,k0,**kwargs):
 
@@ -53,5 +120,5 @@ def confignetwork(N,k0,**kwargs):
 def degreelist(G):
     print([G.degree(i) for i in range(200000)])
 
-G = confignetwork(100,20)
-stylized_network, config = nw.visualize(G)
+#G = swnetwork(10000)
+#stylized_network, config = nw.visualize(G)

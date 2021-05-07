@@ -6,7 +6,7 @@ from numpy import random
 import networkx as nx
 #=========== SIMULATION DETAILS ========
 projectname = "tracing"
-basename = "nolockdown"
+basename = "sw_exp_y05"
 
 seed = -1
 N_measurements = 100
@@ -14,18 +14,24 @@ N_measurements = 100
 measurements = range(N_measurements)
 N = 200_000
 
+
 q = [0,0.1,0.3,0.5,0.7,0.9]
 a = np.linspace(0,1,25)
 R0 = [2.5]
 z = [0.64]
+
+#q = [0.3]
+#a = [0,0.3]
+#R0 = np.linspace(0.1,10,51)
+
 parameter = {
         'chi':1/2.5,
         'recovery_rate' : 1/7,
         'alpha' : 1/3,
         'beta' : 1/2,
-        'number_of_contacts' : 10,
+        'number_of_contacts' : 20,
         'x':0.17,
-        'y':0.1,
+        'y':0.5,
         'I_0' : N*0.01,
         'omega':1/10
         }

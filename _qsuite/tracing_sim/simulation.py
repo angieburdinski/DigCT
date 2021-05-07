@@ -4,8 +4,73 @@ from epipack.stochastic_epi_models import StochasticEpiModel
 from math import exp
 from numpy import random
 import networkx as nx
-from smallworld import get_smallworld_graph
+#from smallworld import get_smallworld_graph
+from scipy.stats import expon
+import numpy as np
+import networkx as nx
 
+def _edge(i,j):
+    if i > j:
+        return (j,i)
+    elif j > i:
+        return (i,j)
+    else:
+        raise ValueError('self-loop')
+
+
+def get_expon_small_world(N,k0,more_lattice_like=False,node_creation_order='random'):
+
+    G = nx.empty_graph(N)
+
+    degree_seq = [ int(k) for k in expon.rvs(scale=k0,size=N)]
+    stubs = list(degree_seq)
+    if sum(stubs) % 2 == 1:
+        stubs[np.random.randint(0,N-1)] += 1
+
+    if node_creation_order == 'random':
+        # generates small world but locally clustered
+        order = np.random.permutation(N)
+    elif node_creation_order == 'desc':
+        # generates locally clustered
+        order = np.argsort(stubs)[::-1]
+    elif node_creation_order == 'asc':
+        # generates locally clustered with short paths
+        order = np.argsort(stubs)
+    else:
+        raise ValueError("`node_creation_order` must be 'random', 'desc', or 'asc', not " + node_creation_order)
+
+    edges = []
+    cnt = 0
+    for i in order:
+        d = 1
+        up = True
+        while stubs[i] > 0:
+            if up:
+                j = (i+d) % N
+            else:
+                j = (i-d) % N
+                d += 1
+            if i == j:
+                break
+            if stubs[j] > 0:#and not G.has_edge(i,j):
+                edges.append(_edge(int(i),int(j)))
+                #G.add_edge(i,j)
+                stubs[i] -= 1
+                stubs[j] -= 1
+            up = not up
+            if d >= N//2:
+                break
+            #f d > N // 2:
+            #    print(stubs[i], np.mean(stubs), np.min(stubs),np.max(stubs),cnt)
+            #    raise ValueError('Couldn''t find stub')
+        cnt += 1
+    #print("leftover stubs:",sum(stubs))
+    #print("number of nodes with leftover stubs:",np.count_nonzero(stubs))
+
+    #print("len(edges) = ", len(edges), "len(set(edges)) = ", len(set(edges)), "difference = ", len(edges) - len(set(edges)))
+    G.add_edges_from(edges)
+
+    return G
 def confignetwork(N, parameter,**kwargs):
     p = parameter
     k0 = p['number_of_contacts']
@@ -61,14 +126,25 @@ def swnetwork(N, parameter,**kwargs):
     print(k_norm)
     return edge_weight_tuples, k_norm
 
+def exp_sw_network(N,parameter,**kwargs):
+    p = parameter
+    k0 = p['number_of_contacts']
+    G = get_expon_small_world(N,k0,node_creation_order='asc')
+    edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
+    k_norm = 2*len(edge_weight_tuples) / N
+    del G
+    print(k_norm)
+    return edge_weight_tuples, k_norm
+
 def simulation_code(kwargs):
 
     def mixed(N, parameter, time, sampling_dt, a, q,z, R0, **kwargs):
 
         p = parameter
 
-        #edge_weight_tuples, k_norm = confignetwork(N,parameter)
-        edge_weight_tuples, k_norm = swnetwork(N,parameter)
+        edge_weight_tuples, k_norm = confignetwork(N,parameter)
+        #edge_weight_tuples, k_norm = swnetwork(N,parameter)
+        #edge_weight_tuples, k_norm = exp_sw_network(N,parameter)
         kappa = (q*p['recovery_rate'])/(1-q)
 
         IPa0 = int(random.binomial(p['I_0'], a, 1))
@@ -112,21 +188,21 @@ def simulation_code(kwargs):
 
         model.set_link_transmission_processes([
 
-                    ('I_Pa','S',R0/k_norm/2*p['beta']/2,'I_Pa','E'),
-                    ('I_Aa','S',R0/k_norm/2*p['recovery_rate']/2,'I_Aa','E'),
-                    ('I_Sa','S',R0/k_norm/2*p['recovery_rate']/2,'I_Sa','E'),
+                    ('I_Pa','S',R0/k_norm*p['beta']/2,'I_Pa','E'),
+                    ('I_Aa','S',R0/k_norm*p['recovery_rate']/2,'I_Aa','E'),
+                    ('I_Sa','S',R0/k_norm*p['recovery_rate']/2,'I_Sa','E'),
 
-                    ('I_P','Sa',R0/k_norm/2*p['beta']/2,'I_P','Ea'),
-                    ('I_A','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_A','Ea'),
-                    ('I_S','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_S','Ea'),
+                    ('I_P','Sa',R0/k_norm*p['beta']/2,'I_P','Ea'),
+                    ('I_A','Sa',R0/k_norm*p['recovery_rate']/2,'I_A','Ea'),
+                    ('I_S','Sa',R0/k_norm*p['recovery_rate']/2,'I_S','Ea'),
 
-                    ('I_Pa','Sa',R0/k_norm/2*p['beta']/2,'I_Pa','Ea'),
-                    ('I_Aa','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_Aa','Ea'),
-                    ('I_Sa','Sa',R0/k_norm/2*p['recovery_rate']/2,'I_Sa','Ea'),
+                    ('I_Pa','Sa',R0/k_norm*p['beta']/2,'I_Pa','Ea'),
+                    ('I_Aa','Sa',R0/k_norm*p['recovery_rate']/2,'I_Aa','Ea'),
+                    ('I_Sa','Sa',R0/k_norm*p['recovery_rate']/2,'I_Sa','Ea'),
 
-                    ('I_P','S',R0/k_norm/2*p['beta']/2,'I_P','E'),
-                    ('I_A','S',R0/k_norm/2*p['recovery_rate']/2,'I_A','E'),
-                    ('I_S','S',R0/k_norm/2*p['recovery_rate']/2,'I_S','E')])
+                    ('I_P','S',R0/k_norm*p['beta']/2,'I_P','E'),
+                    ('I_A','S',R0/k_norm*p['recovery_rate']/2,'I_A','E'),
+                    ('I_S','S',R0/k_norm*p['recovery_rate']/2,'I_S','E')])
 
         model.set_network(N, edge_weight_tuples)
 
@@ -146,7 +222,7 @@ def simulation_code(kwargs):
         del time
         del sampling_dt
 
-        results = max(result['I_S']),max(result['I_Sa']),max(result['R']),max(result['Ra']),max(result['X']),max(result['Xa']),max(result['C'])
+        results = max(result['R']),max(result['Ra']),max(result['X']),max(result['Xa']),max(result['C'])
 
         del result
 
