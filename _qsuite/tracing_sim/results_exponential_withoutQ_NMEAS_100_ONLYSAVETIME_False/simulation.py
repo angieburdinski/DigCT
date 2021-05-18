@@ -4,7 +4,7 @@ from epipack.stochastic_epi_models import StochasticEpiModel
 from math import exp
 from numpy import random
 import networkx as nx
-from smallworld import get_smallworld_graph
+#from smallworld import get_smallworld_graph
 from scipy.stats import expon
 import numpy as np
 import networkx as nx
@@ -104,12 +104,16 @@ def confignetwork(N, parameter,**kwargs):
 def swnetwork(N, parameter,**kwargs):
     p = parameter
     k_over_2 = int(p['number_of_contacts']/2)
+    #beta = 10e-4 #for k = 50, N = 10_000
+    #beta = 10e-5 #for k = 20, N = 10_000
+    #beta = 10e-6 #for k = 20, N = 20_000
     beta = 10e-7 #for k = 20, N = 200_000 or k0=10
     #beta = 1
     G = get_smallworld_graph(N,k_over_2,beta)
     edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
     k_norm = 2*len(edge_weight_tuples) / N
     del G
+    print(k_norm)
     return edge_weight_tuples, k_norm
 
 def exp_sw_network(N,parameter,**kwargs):
@@ -126,8 +130,7 @@ def simulation_code(kwargs):
 
     def mixed(N, parameter, time, sampling_dt,quarantiningS, a, q, y, **kwargs):
         p = parameter
-        #edge_weight_tuples, k_norm = confignetwork(N,parameter)
-        edge_weight_tuples, k_norm = swnetwork(N, parameter)
+        edge_weight_tuples, k_norm = confignetwork(N,parameter)
         kappa = (q*p['recovery_rate'])/(1-q)
         IPa0 = int(random.binomial(p['I_0'], a, 1))
         IP0 = int(p['I_0'] - IPa0)

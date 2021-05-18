@@ -104,8 +104,8 @@ def confignetwork(N, parameter,**kwargs):
 def swnetwork(N, parameter,**kwargs):
     p = parameter
     k_over_2 = int(p['number_of_contacts']/2)
-    beta = 10e-7 #for k = 20, N = 200_000 or k0=10
-    #beta = 1
+    #beta = 10e-7 #for k = 20, N = 200_000 or k0=10
+    beta = 1
     G = get_smallworld_graph(N,k_over_2,beta)
     edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
     k_norm = 2*len(edge_weight_tuples) / N

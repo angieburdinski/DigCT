@@ -14,7 +14,7 @@ measurements = range(N_measurements)
 N = 200_000
 q = [0,0.1,0.3,0.5]
 a = np.linspace(0,1,25)
-y = [0.1]
+y = [0.1,0.5]
 quarantiningS = True
 parameter = {
         'chi':1/2.5,

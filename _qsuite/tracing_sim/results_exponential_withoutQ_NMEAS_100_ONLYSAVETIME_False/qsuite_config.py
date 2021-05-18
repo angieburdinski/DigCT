@@ -6,7 +6,7 @@ from numpy import random
 import networkx as nx
 #=========== SIMULATION DETAILS ========
 projectname = "paper_tracing"
-basename = "smallworld_exponential_asc_withQ"
+basename = "exponential_withoutQ"
 
 seed = -1
 N_measurements = 100
@@ -15,7 +15,7 @@ N = 200_000
 q = [0,0.1,0.3,0.5]
 a = np.linspace(0,1,25)
 y = [0.1]
-quarantiningS = True
+quarantiningS = False
 parameter = {
         'chi':1/2.5,
         'recovery_rate' : 1/7,

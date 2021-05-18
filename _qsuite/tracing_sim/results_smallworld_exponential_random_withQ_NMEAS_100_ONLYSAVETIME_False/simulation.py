@@ -4,7 +4,7 @@ from epipack.stochastic_epi_models import StochasticEpiModel
 from math import exp
 from numpy import random
 import networkx as nx
-from smallworld import get_smallworld_graph
+#from smallworld import get_smallworld_graph
 from scipy.stats import expon
 import numpy as np
 import networkx as nx
@@ -119,7 +119,6 @@ def exp_sw_network(N,parameter,**kwargs):
     edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
     k_norm = 2*len(edge_weight_tuples) / N
     del G
-    print(k_norm)
     return edge_weight_tuples, k_norm
 
 def simulation_code(kwargs):
@@ -127,7 +126,7 @@ def simulation_code(kwargs):
     def mixed(N, parameter, time, sampling_dt,quarantiningS, a, q, y, **kwargs):
         p = parameter
         #edge_weight_tuples, k_norm = confignetwork(N,parameter)
-        edge_weight_tuples, k_norm = swnetwork(N, parameter)
+        edge_weight_tuples, k_norm = exp_sw_network(N,parameter)
         kappa = (q*p['recovery_rate'])/(1-q)
         IPa0 = int(random.binomial(p['I_0'], a, 1))
         IP0 = int(p['I_0'] - IPa0)

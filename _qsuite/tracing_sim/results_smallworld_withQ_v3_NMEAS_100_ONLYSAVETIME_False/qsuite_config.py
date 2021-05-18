@@ -6,7 +6,7 @@ from numpy import random
 import networkx as nx
 #=========== SIMULATION DETAILS ========
 projectname = "paper_tracing"
-basename = "smallworld_exponential_asc_withQ"
+basename = "smallworld_withQ_v3"
 
 seed = -1
 N_measurements = 100

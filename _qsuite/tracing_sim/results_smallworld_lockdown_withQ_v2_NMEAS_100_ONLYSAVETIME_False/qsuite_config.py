@@ -6,7 +6,7 @@ from numpy import random
 import networkx as nx
 #=========== SIMULATION DETAILS ========
 projectname = "paper_tracing"
-basename = "smallworld_exponential_asc_withQ"
+basename = "smallworld_lockdown_withQ_v2"
 
 seed = -1
 N_measurements = 100
@@ -21,12 +21,12 @@ parameter = {
         'recovery_rate' : 1/7,
         'alpha' : 1/3,
         'beta' : 1/2,
-        'number_of_contacts' : 20,
+        'number_of_contacts' : 10,
         'x':0.17,
         'I_0' : N*0.01,
         'omega':1/10,
         "z": 0.64,
-        "R0": 2.5,
+        "R0": 1.25,
         }
 
 sampling_dt = 1
