@@ -415,15 +415,15 @@ class stoch_mixed_tracing():
             self.model.set_conditional_link_transmission_processes({
 
             ("Ta", "->", "Xa") : [
-                    ("Xa", "I_Pa", p.z*p.y, "Xa", "Ta" ),
-                    ("Xa", "I_Sa", p.z*p.y, "Xa", "Ta" ),
-                    ("Xa", "I_Aa", p.z*p.y, "Xa", "Ta" ),
-                    ("Xa", "Ea", p.z*p.y, "Xa", "Ta" ),
-                    ("Xa", "Sa", p.z, "Xa", "Qa" ),
-                    ("Xa", "I_Pa", p.z*(1-p.y), "Xa", "Xa" ),
-                    ("Xa", "I_Sa", p.z*(1-p.y), "Xa", "Xa" ),
-                    ("Xa", "I_Aa", p.z*(1-p.y), "Xa", "Xa" ),
-                    ("Xa", "Ea", p.z*(1-p.y), "Xa", "Xa" )]
+                    ("Xa", "I_Pa", p.y, "Xa", "Ta" ),
+                    ("Xa", "I_Sa", p.y, "Xa", "Ta" ),
+                    ("Xa", "I_Aa", p.y, "Xa", "Ta" ),
+                    ("Xa", "Ea", p.y, "Xa", "Ta" ),
+                    ("Xa", "Sa", "->", "Xa", "Qa" ),
+                    ("Xa", "I_Pa", (1-p.y), "Xa", "Xa" ),
+                    ("Xa", "I_Sa", (1-p.y), "Xa", "Xa" ),
+                    ("Xa", "I_Aa", (1-p.y), "Xa", "Xa" ),
+                    ("Xa", "Ea", (1-p.y), "Xa", "Xa" )]
 
                     })
 
@@ -460,20 +460,21 @@ class stoch_mixed_tracing():
                         ('I_Aa',p.recovery_rate,'Ra'),
                         ('I_Sa',p.recovery_rate,'Ra'),
                         ('I_Sa',kappa,'Ta'),
-                        ('Ta',p.chi,'Xa')])
+                        ('Ta',p.z*p.chi,'Xa'),
+                        ('Ta',(1-p.z)*p.chi,'X')])
 
         else:
             self.model.set_conditional_link_transmission_processes({
 
             ("Ta", "->", "Xa") : [
-                    ("Xa", "I_Pa", p.z*p.y, "Xa", "Ta" ),
-                    ("Xa", "I_Sa", p.z*p.y, "Xa", "Ta" ),
-                    ("Xa", "I_Aa", p.z*p.y, "Xa", "Ta" ),
-                    ("Xa", "Ea", p.z*p.y, "Xa", "Ta" ),
-                    ("Xa", "I_Pa", p.z*(1-p.y), "Xa", "Xa" ),
-                    ("Xa", "I_Sa", p.z*(1-p.y), "Xa", "Xa" ),
-                    ("Xa", "I_Aa", p.z*(1-p.y), "Xa", "Xa" ),
-                    ("Xa", "Ea", p.z*(1-p.y), "Xa", "Xa" )]
+                    ("Xa", "I_Pa", p.y, "Xa", "Ta" ),
+                    ("Xa", "I_Sa", p.y, "Xa", "Ta" ),
+                    ("Xa", "I_Aa", p.y, "Xa", "Ta" ),
+                    ("Xa", "Ea", p.y, "Xa", "Ta" ),
+                    ("Xa", "I_Pa", (1-p.y), "Xa", "Xa" ),
+                    ("Xa", "I_Sa", (1-p.y), "Xa", "Xa" ),
+                    ("Xa", "I_Aa", (1-p.y), "Xa", "Xa" ),
+                    ("Xa", "Ea", (1-p.y), "Xa", "Xa" )]
 
                     })
 
@@ -509,7 +510,8 @@ class stoch_mixed_tracing():
                         ('I_Aa',p.recovery_rate,'Ra'),
                         ('I_Sa',p.recovery_rate,'Ra'),
                         ('I_Sa',kappa,'Ta'),
-                        ('Ta',p.chi,'Xa')])
+                        ('Ta',p.z*p.chi,'Xa'),
+                        ('Ta',(1-p.z)*p.chi,'X')])
         self.model.set_network(self.N,self.edge_weight_tuples)
         self.model.set_random_initial_conditions({ 'Sa' : Sa0,'S' : S0,'I_P':IP0,'I_Pa':IPa0})
 
