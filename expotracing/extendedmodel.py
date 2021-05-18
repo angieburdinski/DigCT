@@ -5,7 +5,6 @@ import networkx as nx
 from numpy import random
 class ParamDict(dict):
     """
-
     """
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
@@ -351,11 +350,11 @@ class stoch_mixed_tracing():
         self.edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
         self.k_norm = 2*len(self.edge_weight_tuples) / self.N
         if self.quarantine_S_contacts == True:
-            model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa'],self.N, self.edge_weight_tuples,directed=False)
+            model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa',"C"],self.N, self.edge_weight_tuples,directed=False)
             self.model = model
 
         else:
-            model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa'],self.N,self.edge_weight_tuples,directed=False)
+            model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa',"C"],self.N,self.edge_weight_tuples,directed=False)
             self.model = model
 
     def compute(self, time):
@@ -420,10 +419,10 @@ class stoch_mixed_tracing():
                     ("Xa", "I_Aa", p.y, "Xa", "Ta" ),
                     ("Xa", "Ea", p.y, "Xa", "Ta" ),
                     ("Xa", "Sa", "->", "Xa", "Qa" ),
-                    ("Xa", "I_Pa", (1-p.y), "Xa", "Xa" ),
-                    ("Xa", "I_Sa", (1-p.y), "Xa", "Xa" ),
-                    ("Xa", "I_Aa", (1-p.y), "Xa", "Xa" ),
-                    ("Xa", "Ea", (1-p.y), "Xa", "Xa" )]
+                    ("Xa", "I_Pa", (1-p.y), "Xa", "C" ),
+                    ("Xa", "I_Sa", (1-p.y), "Xa", "C" ),
+                    ("Xa", "I_Aa", (1-p.y), "Xa", "C" ),
+                    ("Xa", "Ea", (1-p.y), "Xa", "C" )]
 
                     })
 
@@ -471,10 +470,10 @@ class stoch_mixed_tracing():
                     ("Xa", "I_Sa", p.y, "Xa", "Ta" ),
                     ("Xa", "I_Aa", p.y, "Xa", "Ta" ),
                     ("Xa", "Ea", p.y, "Xa", "Ta" ),
-                    ("Xa", "I_Pa", (1-p.y), "Xa", "Xa" ),
-                    ("Xa", "I_Sa", (1-p.y), "Xa", "Xa" ),
-                    ("Xa", "I_Aa", (1-p.y), "Xa", "Xa" ),
-                    ("Xa", "Ea", (1-p.y), "Xa", "Xa" )]
+                    ("Xa", "I_Pa", (1-p.y), "Xa", "C" ),
+                    ("Xa", "I_Sa", (1-p.y), "Xa", "C" ),
+                    ("Xa", "I_Aa", (1-p.y), "Xa", "C" ),
+                    ("Xa", "Ea", (1-p.y), "Xa", "C" )]
 
                     })
 
