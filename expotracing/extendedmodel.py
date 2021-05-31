@@ -244,7 +244,7 @@ class mixed_tracing():
         """
         result = self.model.integrate(t, integrator='dopri5')
         self.result = result
-        return result
+        return t, result
 
     def set_parameters(self,parameters):
         """
@@ -529,19 +529,24 @@ if __name__=="__main__":
             'x':0.17,
             'y':0.1,
             'z':0.64,
-            'I_0' : 10,
+            'I_0' : 200000*0.01,
             'omega':1/10
             }
-    N = 10000
-    k0 = 19
-    G = nx.barabasi_albert_graph(N,k0)
-    model = stoch_mixed_tracing(G,True)
-    model.set_parameters(parameter)
-    t,result = model.compute(10000)
-    print(t,result)
+    #N = 10000
+    #k0 = 19
+    #G = nx.barabasi_albert_graph(N,k0)
+    t = np.linspace(0,200,1001)
     plt.figure()
+    model = mixed_tracing(N = 200000, quarantine_S_contacts = True)
+    for i in np.logspace(0.1,100,10):
+        parameter.update({"chi":i})
+        model.set_parameters(parameter)
+        t,result = model.compute(t)
+        print(t,result)
 
-    for comp, series in result.items():
-        plt.plot(t, series, label=comp)
+        plt.plot(t,result["R"]+result["X"],label = i)
+
+    #for comp, series in result.items():
+    #    plt.plot(t, series, label=comp)
     plt.legend()
     plt.show()

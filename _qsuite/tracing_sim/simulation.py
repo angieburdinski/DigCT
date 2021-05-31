@@ -119,15 +119,15 @@ def exp_sw_network(N,parameter,**kwargs):
     edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
     k_norm = 2*len(edge_weight_tuples) / N
     del G
-    print(k_norm)
+    print(k_norm,N)
     return edge_weight_tuples, k_norm
 
 def simulation_code(kwargs):
 
-    def mixed(N, parameter, time, sampling_dt,quarantiningS, a, q, y, **kwargs):
+    def mixed(N, parameter, time, sampling_dt,quarantiningS, a, q, R0, **kwargs):
         p = parameter
-        #edge_weight_tuples, k_norm = confignetwork(N,parameter)
-        edge_weight_tuples, k_norm = swnetwork(N, parameter)
+        edge_weight_tuples, k_norm = confignetwork(N,parameter)
+        #edge_weight_tuples, k_norm = swnetwork(N, parameter)
         kappa = (q*p['recovery_rate'])/(1-q)
         IPa0 = int(random.binomial(p['I_0'], a, 1))
         IP0 = int(p['I_0'] - IPa0)
@@ -137,15 +137,15 @@ def simulation_code(kwargs):
             model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa','C'],N, edge_weight_tuples ,directed=False)
             model.set_conditional_link_transmission_processes({
             ("Ta", "->", "Xa") : [
-                    ("Xa", "I_Pa", y, "Xa", "Ta" ),
-                    ("Xa", "I_Sa", y, "Xa", "Ta" ),
-                    ("Xa", "I_Aa", y, "Xa", "Ta" ),
-                    ("Xa", "Ea", y, "Xa", "Ta" ),
+                    ("Xa", "I_Pa", p["y"], "Xa", "Ta" ),
+                    ("Xa", "I_Sa", p["y"], "Xa", "Ta" ),
+                    ("Xa", "I_Aa", p["y"], "Xa", "Ta" ),
+                    ("Xa", "Ea", p["y"], "Xa", "Ta" ),
                     ("Xa", "Sa", "->", "Xa", "Qa" ),
-                    ("Xa", "I_Pa", (1-y), "Xa", "C" ),
-                    ("Xa", "I_Sa", (1-y), "Xa", "C" ),
-                    ("Xa", "I_Aa", (1-y), "Xa", "C" ),
-                    ("Xa", "Ea", (1-y), "Xa", "C" )]
+                    ("Xa", "I_Pa", (1-p["y"]), "Xa", "C" ),
+                    ("Xa", "I_Sa", (1-p["y"]), "Xa", "C" ),
+                    ("Xa", "I_Aa", (1-p["y"]), "Xa", "C" ),
+                    ("Xa", "Ea", (1-p["y"]), "Xa", "C" )]
                     })
             model.set_node_transition_processes([
                         ('E',p['alpha'],'I_P'),
@@ -196,21 +196,21 @@ def simulation_code(kwargs):
                         ('Ta',(1-p["z"])*p['chi'],'X')])
         model.set_link_transmission_processes([
 
-                    ('I_Pa','S',p["R0"]/k_norm*p['beta']/2,'I_Pa','E'),
-                    ('I_Aa','S',p["R0"]/k_norm*p['recovery_rate']/2,'I_Aa','E'),
-                    ('I_Sa','S',p["R0"]/k_norm*p['recovery_rate']/2,'I_Sa','E'),
+                    ('I_Pa','S',R0/k_norm*p['beta']/2,'I_Pa','E'),
+                    ('I_Aa','S',R0/k_norm*p['recovery_rate']/2,'I_Aa','E'),
+                    ('I_Sa','S',R0/k_norm*p['recovery_rate']/2,'I_Sa','E'),
 
-                    ('I_P','Sa',p["R0"]/k_norm*p['beta']/2,'I_P','Ea'),
-                    ('I_A','Sa',p["R0"]/k_norm*p['recovery_rate']/2,'I_A','Ea'),
-                    ('I_S','Sa',p["R0"]/k_norm*p['recovery_rate']/2,'I_S','Ea'),
+                    ('I_P','Sa',R0/k_norm*p['beta']/2,'I_P','Ea'),
+                    ('I_A','Sa',R0/k_norm*p['recovery_rate']/2,'I_A','Ea'),
+                    ('I_S','Sa',R0/k_norm*p['recovery_rate']/2,'I_S','Ea'),
 
-                    ('I_Pa','Sa',p["R0"]/k_norm*p['beta']/2,'I_Pa','Ea'),
-                    ('I_Aa','Sa',p["R0"]/k_norm*p['recovery_rate']/2,'I_Aa','Ea'),
-                    ('I_Sa','Sa',p["R0"]/k_norm*p['recovery_rate']/2,'I_Sa','Ea'),
+                    ('I_Pa','Sa',R0/k_norm*p['beta']/2,'I_Pa','Ea'),
+                    ('I_Aa','Sa',R0/k_norm*p['recovery_rate']/2,'I_Aa','Ea'),
+                    ('I_Sa','Sa',R0/k_norm*p['recovery_rate']/2,'I_Sa','Ea'),
 
-                    ('I_P','S',p["R0"]/k_norm*p['beta']/2,'I_P','E'),
-                    ('I_A','S',p["R0"]/k_norm*p['recovery_rate']/2,'I_A','E'),
-                    ('I_S','S',p["R0"]/k_norm*p['recovery_rate']/2,'I_S','E')])
+                    ('I_P','S',R0/k_norm*p['beta']/2,'I_P','E'),
+                    ('I_A','S',R0/k_norm*p['recovery_rate']/2,'I_A','E'),
+                    ('I_S','S',R0/k_norm*p['recovery_rate']/2,'I_S','E')])
         model.set_network(N, edge_weight_tuples)
 
         del edge_weight_tuples
