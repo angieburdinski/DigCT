@@ -7,6 +7,7 @@ import networkx as nx
 import epipack
 from epipack.vis import visualize
 from numpy import random
+from smallworld import get_smallworld_graph
 
 class ParamDict(dict):
     """
@@ -76,7 +77,14 @@ class vis_mixed_config():
     def __init__(self,N,k0,t,parameter):
         self.N = N
         self.k0 = k0
-        self.G = configuration_network(self.N,self.k0).build()
+        k_over_2 = int(self.k0/2)
+        beta = 10e-9
+        #beta = 10e-3 #for k = 20, N = 1000
+        #beta = 10e-5 #for k = 20, N = 10_000
+        #beta = 10e-6 #for k = 20, N = 20_000
+        #beta = 10e-7 #for k = 20, N = 200_000
+        self.G = get_smallworld_graph(self.N,k_over_2,beta)
+        #self.G = configuration_network(self.N,self.k0).build()
         self.t = t
         self.edge_weight_tuples = [ (e[0], e[1], 1.0) for e in self.G.edges() ]
         self.k_norm = 2*len(self.edge_weight_tuples) /self.N
@@ -88,15 +96,15 @@ class vis_mixed_config():
         self.model.set_conditional_link_transmission_processes({
 
                 ("Ta", "->", "Xa") : [
-                        ("Xa", "I_Pa", p.z*p.y, "Xa", "Ta" ),
-                        ("Xa", "I_Sa", p.z*p.y, "Xa", "Ta" ),
-                        ("Xa", "I_Aa", p.z*p.y, "Xa", "Ta" ),
-                        ("Xa", "Ea", p.z*p.y, "Xa", "Ta" ),
-                        ("Xa", "Sa", p.z, "Xa", "Qa" ),
-                        ("Xa", "I_Pa", p.z*(1-p.y), "Xa", "Xa" ),
-                        ("Xa", "I_Sa", p.z*(1-p.y), "Xa", "Xa" ),
-                        ("Xa", "I_Aa", p.z*(1-p.y), "Xa", "Xa" ),
-                        ("Xa", "Ea", p.z*(1-p.y), "Xa", "Xa" )]
+                        ("Xa", "I_Pa", p.y, "Xa", "Ta" ),
+                        ("Xa", "I_Sa", p.y, "Xa", "Ta" ),
+                        ("Xa", "I_Aa", p.y, "Xa", "Ta" ),
+                        ("Xa", "Ea", p.y, "Xa", "Ta" ),
+                        ("Xa", "Sa", "->", "Xa", "Qa" ),
+                        ("Xa", "I_Pa", (1-p.y), "Xa", "Xa" ),
+                        ("Xa", "I_Sa", (1-p.y), "Xa", "Xa" ),
+                        ("Xa", "I_Aa", (1-p.y), "Xa", "Xa" ),
+                        ("Xa", "Ea", (1-p.y), "Xa", "Xa" )]
 
                         })
 
@@ -133,12 +141,13 @@ class vis_mixed_config():
                     ('I_Aa',p.recovery_rate,'Ra'),
                     ('I_Sa',p.recovery_rate,'Ra'),
                     ('I_Sa',kappa,'Ta'),
-                    ('Ta',p.chi,'Xa')])
+                    ('Ta',p.z*p.chi,'Xa'),
+                    ('Ta',(1-p.z)*p.chi,'X')])
 
         self.model.set_network(self.N,self.edge_weight_tuples)
         self.model.set_random_initial_conditions({ 'Sa' : Sa0,'S' : S0,'I_P':p.I_0})
         stylized_network, config = nw.visualize(self.G)
-        visualize(self.model, stylized_network, sampling_dt=0.1)
+        visualize(self.model, stylized_network, sampling_dt=0.1,ignore_plot_compartments=['S','Sa'],quarantine_compartments=['X',"Xa","R","Ra"],)
 
 class analysis():
     """
@@ -365,21 +374,21 @@ if __name__=="__main__":
     parameter = {
             'R0': 2.5,
             'q': 0.5,
-            'app_participation': 0.33,
+            'app_participation': 0.3,
             #'chi':1,
             'chi':1/2.5,
-            'recovery_rate' : 1/6,
-            'alpha' : 1/2,
+            'recovery_rate' : 1/7,
+            'alpha' : 1/3,
             'beta' : 1/2,
             'number_of_contacts' : 6.3,
-            'x':0.4,
+            'x':0.17,
             'y':0.1,
             'z':0.64,
-            'I_0' : 1000,
+            'I_0' : 10,
             'omega':1/10
             }
 
     q = [0,0.01,0.2,0.4,0.6,0.8]
     a = np.linspace(0,0.8,25)
-
-    results = analysis(model,parameter).two_range_result('app_participation',a,'q',q,t)
+    vis_mixed_config(N = 1000, k0 = 20, t = t, parameter = parameter)
+    #results = analysis(model,parameter).two_range_result('app_participation',a,'q',q,t)
