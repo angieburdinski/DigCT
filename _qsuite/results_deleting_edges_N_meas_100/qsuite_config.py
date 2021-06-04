@@ -24,17 +24,12 @@ phases_definitions = {
 phases = ['free', 'periodic lockdown']
 
 N = 200000
-rho =  1/7
-chi = 1/2.5
+k0 = 20
 alpha = 1/3
-beta = 1/2
-k0 =  20
-x = 0.17
-I0_prob = 0.001
-omega = 1/10
-z = 0.64
+rho = 1/9
 R0 = 2.5
-y = 0.1
+I0_prob = 0.001
+
 q = 0.3
 a_s = [0.0, 0.3, 0.5]
 
@@ -55,13 +50,6 @@ standard_parameters = [
                         ('I0_prob', I0_prob),
                         ('q', q),
                         ('alpha',alpha),
-                        ('chi', chi),
-                        ('beta',beta),
-                        ('k0',k0),
-                        ('x',x),
-                        ('y',y),
-                        ('z',z),
-                        ('omega',omega),
                         ('rho',rho),
                         ('N', N),
                         ('delete_edges_instead_of_scaling_R', delete_edges_instead_of_scaling_R),
@@ -75,7 +63,7 @@ memory = "8G"
 priority = 0
 
 #============ CLUSTER SETTINGS ============
-username = "aburd"
+username = "bfmaier"
 server = "groot0.biologie.hu-berlin.de"
 useratserver = username + u'@' + server
 
@@ -93,3 +81,4 @@ n_local_cpus = 3
 git_repos = [
                 #( "/home/"+username+"/brownian-motion", pythonpath + " setup.py install --user" )
             ]
+

@@ -73,7 +73,15 @@ def load_export_data():
     with open('data_new.json', 'w') as outfile:
         json.dump(data_new, outfile)
 #load_export_data()
+def load_data():
+    with open('data_new.json') as json_file:
+        data = json.load(json_file)
+    x = np.linspace(0,1,25)
+    for i in range(len(data["exp"]["reduction"]["4.0"]))
+    plt.plot(data["exp"]["reduction"]["4.0"][]/data["exp_noQ"]["reduction"]["4.0"])
 
+    plt.show()
+load_data()
 def fast_plot(plot_old = True):
     load_export_data()
     with open('data_new.json') as json_file:
@@ -348,7 +356,7 @@ def ascrand():
 
 
     plt.show()
-ascrand()
+
 def R_0():
     exp_R0  = np.load('_qsuite/tracing_sim/results_exponential_R0_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
     exp_R0_0 = np.array(sum([exp_R0['mean'][0,0,:,i] for i in range(5)]))/200_000

@@ -102,7 +102,7 @@ for iph, phase in enumerate(cf.phases):
         ax[0].set_xlabel('time [days]')
         ax[1].set_xlabel('time [days]')
         ax[2].set_xlabel('time [days]')
-
+    ax[0].axvspan(20, 20, alpha=0.5, color='g')
     ax[0].set_ylabel('cumulative infections')
     ax[1].set_ylabel('relative averted infections (cumulative)')
     ax[2].set_ylabel('averted infections per day')

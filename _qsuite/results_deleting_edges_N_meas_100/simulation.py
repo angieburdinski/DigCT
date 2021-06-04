@@ -17,19 +17,28 @@ def make_equal_length(arr_list):
 
 def simulation_code(kw):
 
+    S, E, I, R, X = list("SEIRX")
+    Sa, Ea, Ia, Ra, Xa = [letter+"a" for letter in "SEIRX"]
+    Za = "Za"
+    Ya = "Ya"
+
     a = kw['a']
     q = kw['q']
-    I0 = kw['I0_prob']
+
     k0 = kw['k0']
+    I0 = kw['I0_prob']
+    alpha = kw['alpha']
+    R0 = kw['R0']
+    rho = kw['rho']
 
+    kappa =  rho * q/(1-q)
 
-    kappa =  kw["rho"] * q/(1-q)
 
     N = kw['N']
     p = kw['k0'] / (N-1)
     G = nx.fast_gnp_random_graph(N, p)
     edges = [ (u,v,1.) for u, v in G.edges() ]
-    k_norm = 2*len(edges)/N
+
     #tmaxs = [40,40,40,1e300]
     #Rscale = [1.0,0.4,1.0,0.4]
     #tmaxs = [1e300]
@@ -51,8 +60,6 @@ def simulation_code(kw):
     timebin_results = []
     last_t = 0
 
-    #print(len(edges))
-
     if delete_edges_instead_of_scaling_R:
         ndx = np.random.permutation(len(edges))
         scrambled_edges = [ edges[i] for i in ndx ]
@@ -62,66 +69,36 @@ def simulation_code(kw):
         if delete_edges_instead_of_scaling_R:
             these_edges = scrambled_edges[:int(this_Rscale*len(edges))]
             this_Rscale = 1
-            #print(len(these_edges))
         else:
             these_edges = edges
 
-        #model = epk.StochasticEpiModel([S,E,I,R,X,Sa,Ea,Ia,Ra,Xa,Ya,Za],N,edge_weight_tuples=these_edges)\
-
-        model = epk.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa','C'],N, edge_weight_tuples=these_edges ,)
-        model.set_conditional_link_transmission_processes({
-            ("Ta", "->", "Xa") : [
-                    ("Xa", "I_Pa", kw["y"], "Xa", "Ta" ),
-                    ("Xa", "I_Sa", kw["y"], "Xa", "Ta" ),
-                    ("Xa", "I_Aa", kw["y"], "Xa", "Ta" ),
-                    ("Xa", "Ea", kw["y"], "Xa", "Ta" ),
-                    ("Xa", "Sa", "->", "Xa", "Qa" ),
-                    ("Xa", "I_Pa", (1-kw["y"]), "Xa", "C" ),
-                    ("Xa", "I_Sa", (1-kw["y"]), "Xa", "C" ),
-                    ("Xa", "I_Aa", (1-kw["y"]), "Xa", "C" ),
-                    ("Xa", "Ea", (1-kw["y"]), "Xa", "C" )]
-                    })
-        model.set_node_transition_processes([
-                    ('E',kw['alpha'],'I_P'),
-                    ('I_P',(1-kw['x'])*kw['beta'],'I_S'),
-                    ('I_P',kw['x']*kw['beta'],'I_A'),
-                    ('I_A',kw['rho'],'R'),
-                    ('I_S',kw['rho'],'R'),
-                    ('I_S',kappa,'T'),
-                    ('T',kw['chi'],'X'),
-                    ('Qa',kw['omega'],'Sa'),
-                    ('Ea',kw['alpha'],'I_Pa'),
-                    ('I_Pa',(1-kw['x'])*kw['beta'],'I_Sa'),
-                    ('I_Pa',kw['x']*kw['beta'],'I_Aa'),
-                    ('I_Aa',kw['rho'],'Ra'),
-                    ('I_Sa',kw['rho'],'Ra'),
-                    ('I_Sa',kappa,'Ta'),
-                    ('Ta',kw["z"]*kw['chi'],'Xa'),
-                    ('Ta',(1-kw["z"])*kw['chi'],'X')])
-        model.set_link_transmission_processes([
-
-                    ('I_Pa','S',kw["R0"]/k_norm*kw['beta']/2,'I_Pa','E'),
-                    ('I_Aa','S',kw["R0"]/k_norm*kw['rho']/2,'I_Aa','E'),
-                    ('I_Sa','S',kw["R0"]/k_norm*kw['rho']/2,'I_Sa','E'),
-
-                    ('I_P','Sa',kw["R0"]/k_norm*kw['beta']/2,'I_P','Ea'),
-                    ('I_A','Sa',kw["R0"]/k_norm*kw['rho']/2,'I_A','Ea'),
-                    ('I_S','Sa',kw["R0"]/k_norm*kw['rho']/2,'I_S','Ea'),
-
-                    ('I_Pa','Sa',kw["R0"]/k_norm*kw['beta']/2,'I_Pa','Ea'),
-                    ('I_Aa','Sa',kw["R0"]/k_norm*kw['rho']/2,'I_Aa','Ea'),
-                    ('I_Sa','Sa',kw["R0"]/k_norm*kw['rho']/2,'I_Sa','Ea'),
-
-                    ('I_P','S',kw["R0"]/k_norm*kw['beta']/2,'I_P','E'),
-                    ('I_A','S',kw["R0"]/k_norm*kw['rho']/2,'I_A','E'),
-                    ('I_S','S',kw["R0"]/k_norm*kw['rho']/2,'I_S','E')])
-
+        model = epk.StochasticEpiModel([S,E,I,R,X,Sa,Ea,Ia,Ra,Xa,Ya,Za],N,edge_weight_tuples=these_edges)\
+                   .set_node_transition_processes([
+                           ("Ea", alpha, "Ia"),
+                           ("Ia", rho,"Ra"),
+                           ("Ia", kappa, "Xa"),
+                           ("E", alpha, "I"),
+                           ("I", rho,"R"),
+                           ("I", kappa, "X"),
+                       ])\
+                   .set_link_transmission_processes([
+                           ("Ia", "Sa", R0*rho/k0*this_Rscale, "Ia", "Ea"),
+                           ("Ia", "S", R0*rho/k0*this_Rscale, "Ia", "E"),
+                           ("I", "Sa", R0*rho/k0*this_Rscale, "I", "Ea"),
+                           ("I", "S", R0*rho/k0*this_Rscale, "I", "E"),
+                       ])\
+                   .set_conditional_link_transmission_processes({
+                        ( "Ia", "->", "Xa" ) : [
+                                ("Xa", "Ia", "->", "Xa", "Ya"),
+                                ("Xa", "Ea", "->", "Xa", "Za"),
+                            ]
+                       })
         if node_statuses is None:
             model.set_random_initial_conditions({
                            "Sa": _S0a,
-                           "I_Pa": _I0a,
+                           "Ia": _I0a,
                            "S": _S0,
-                           "I_P": _I0,
+                           "I": _I0,
                        })
         else:
             model.set_node_statuses(node_statuses)
@@ -163,18 +140,7 @@ if __name__ == "__main__":
             kw[p[0]] = p[1]
 
     kw['phase'] = 'periodic lockdown'
-    kw['N'] = 200000
-    kw['chi'] = 1/2.5
-    kw['rho'] =  1/7
-    kw['alpha'] = 1/3
-    kw['beta'] = 1/2
-    kw['k0'] =  20
-    kw['x'] = 0.17
-    kw['I0_prob'] = 0.001
-    kw['omega'] = 1/10
-    kw['z'] = 0.64
-    kw['R0'] = 2.5
-    kw['y'] = 0.1
+    kw['N'] = 20000
 
     print("using config:")
     pprint(kw)
@@ -185,7 +151,6 @@ if __name__ == "__main__":
     from epipack.plottools import plot
 
     t = np.arange(len(result['S']))
-    #plot(t, result["I_P"])
-    pl.plot(t, result["I_P"]+result["I_Pa"])
+    plot(t, result)
 
     pl.show()

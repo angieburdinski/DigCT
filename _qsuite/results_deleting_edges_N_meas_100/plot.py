@@ -1,7 +1,8 @@
 import numpy as np
-#import bfmplot as bp
 #from bfmplot import pl
+#import bfmplot as bp
 import matplotlib.pyplot as pl
+
 import pickle
 from epipack.plottools import plot
 
@@ -39,9 +40,13 @@ for iph, phase in enumerate(cf.phases):
     for ia in range(len(cf.a_s)):
         I = means[iph][ia]['Itot']
         StdI = stds[iph][ia]['Itot']/fc
-        _p, = ax.plot(t,  sumres(means[iph][ia],['I_P','I_Pa','I_S','I_Sa','I_A','I_Aa']), label = f"a = {cf.a_s[ia]}")
+        _p, = ax.plot(t,  sumres(means[iph][ia],['I','Ia']), label = f"a = {cf.a_s[ia]}")
         if plot_errors:
             ax.fill_between(t,  I-StdI, I+StdI,color=_p.get_color(),alpha=al,edgecolor='None')
+    if phase == 'periodic lockdown':
+        x = cf.phases_definitions[phase]["tmaxs"]
+        ax.axvspan(x[0], x[0]*2, alpha=0.3, color='grey')
+        ax.axvspan(x[0]*3, max(t), alpha=0.3, color='grey')
 
     ax.set_xlim([0,t[-1]*0.55])
     ax.set_ylim([0,ax.get_ylim()[1]])
@@ -54,9 +59,15 @@ for iph, phase in enumerate(cf.phases):
     StdOmeg0 = stds[iph][ia00]['Stot']/fc
 
     ax = ax2[1:]
+    if phase == 'periodic lockdown':
+        for i in range(3):
+            x = cf.phases_definitions['periodic lockdown']["tmaxs"]
+            ax[i].axvspan(x[0], x[0]*2, alpha=0.3, color='grey')
+            ax[i].axvspan(x[0]*3, max(t), alpha=0.3, color='grey')
     ax[0].plot(t,Omeg0,label='$\Omega(0)$',lw=3)
 
     for ia, a in enumerate(cf.a_s):
+
         if ia == 0:
             continue
         Omeg_a = cf.N - means[iph][ia]['Stot']

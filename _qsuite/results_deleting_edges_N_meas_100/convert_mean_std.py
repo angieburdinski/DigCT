@@ -1,9 +1,13 @@
 import pickle
 import qsuite_config as cf
 import numpy as np
-S,E,I_P,I_S,I_A,R,T,X,Sa,Ea,I_Pa,I_Sa,I_Aa,Ra,Ta,Xa,Qa,C= 'S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa','C'
 
-compartments = [S,E,I_P,I_S,I_A,R,T,X,Sa,Ea,I_Pa,I_Sa,I_Aa,Ra,Ta,Xa,Qa,C]
+S, E, I, R, X = list("SEIRX")
+Sa, Ea, Ia, Ra, Xa = [letter+"a" for letter in "SEIRX"]
+Za = "Za"
+Ya = "Ya"
+
+compartments = [S,E,I,R,X,Sa,Ea,Ia,Ra,Xa,Ya,Za]
 
 def make_length(arr,maxlen):
     dL = maxlen - len(arr)
@@ -34,7 +38,7 @@ def flatten(x):
 def sumres(result,compartments):
     return sum([result[C] for C in compartments])
 
-with open('/Users/angeliqueburdinski/Desktop/results_deleting_edges_N_meas_100/results.p','rb') as f:
+with open('results.p','rb') as f:
     data = pickle.load(f)
 
 maxlen = max([ len(res['S']) for res in flatten(data) ])
@@ -55,8 +59,8 @@ for iphase, phase in enumerate(cf.phases):
             result_mean[C] = thismean
             result_std[C] = thisstd
         for Cname, C in [
-                    ('Stot', ['S','Sa','Qa']),
-                    ('Itot', ['I_P','I_Pa','I_S','I_Sa','I_A','I_Aa']),
+                    ('Stot', ['S','Sa']),
+                    ('Itot', ['I','Ia']),
                     ('Etot', ['E','Ea']),
                 ]:
             vals = [ make_length(sumres(data[meas][iphase][ia],C),maxlen) for meas in cf.measurements ]
@@ -69,5 +73,9 @@ for iphase, phase in enumerate(cf.phases):
         stds[-1].append(result_std)
 
 
-with open('/Users/angeliqueburdinski/Desktop/results_deleting_edges_N_meas_100/results_mean_std.p','wb') as f:
+with open('results_mean_std.p','wb') as f:
     pickle.dump({'means':means,'stds':stds},f)
+
+
+
+

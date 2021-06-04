@@ -34,14 +34,20 @@ for iph, phase in enumerate(cf.phases):
 
     #fig, ax = pl.subplots(1,1,figsize=(4,4))
     fig2, ax2 = pl.subplots(1,4,figsize=(15,4),sharex=True)
+
     ax = ax2[0]
 
     for ia in range(len(cf.a_s)):
+        #if ia != 2:
         I = means[iph][ia]['Itot']
         StdI = stds[iph][ia]['Itot']/fc
         _p, = ax.plot(t,  sumres(means[iph][ia],['I_P','I_Pa','I_S','I_Sa','I_A','I_Aa']), label = f"a = {cf.a_s[ia]}")
         if plot_errors:
             ax.fill_between(t,  I-StdI, I+StdI,color=_p.get_color(),alpha=al,edgecolor='None')
+    if phase == 'periodic lockdown':
+        x = cf.phases_definitions[phase]["tmaxs"]
+        ax.axvspan(x[0], x[0]*2, alpha=0.3, color='grey')
+        ax.axvspan(x[0]*3, max(t), alpha=0.3, color='grey')
 
     ax.set_xlim([0,t[-1]*0.55])
     ax.set_ylim([0,ax.get_ylim()[1]])
@@ -54,11 +60,20 @@ for iph, phase in enumerate(cf.phases):
     StdOmeg0 = stds[iph][ia00]['Stot']/fc
 
     ax = ax2[1:]
+
+    if phase == 'periodic lockdown':
+        for i in range(3):
+            x = cf.phases_definitions['periodic lockdown']["tmaxs"]
+            ax[i].axvspan(x[0], x[0]*2, alpha=0.3, color='grey')
+            ax[i].axvspan(x[0]*3, max(t), alpha=0.3, color='grey')
+
     ax[0].plot(t,Omeg0,label='$\Omega(0)$',lw=3)
 
     for ia, a in enumerate(cf.a_s):
         if ia == 0:
             continue
+        #if ia == 2:
+        #    continue
         Omeg_a = cf.N - means[iph][ia]['Stot']
         StdOmeg_a = stds[iph][ia]['Stot']/fc
         dOm = Omeg0 - Omeg_a
@@ -107,9 +122,15 @@ for iph, phase in enumerate(cf.phases):
     ax[1].set_ylabel('relative averted infections (cumulative)')
     ax[2].set_ylabel('averted infections per day')
 
+
     ax[1].yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1,decimals=0))
     for col in range(4):
-        ax2[col].set_xlim([0,t[-1]*0.55])
+        #ax2[col].set_xlim([0,t[-1]*0.55])
+        ax2[0].set_ylim([0,35_000])
+        ax2[1].set_ylim([0,170_000])
+        ax2[2].set_ylim([-0.02,0.15])
+        ax2[3].set_ylim([-200,900])
+        ax2[col].set_xlim([0,180])
         #bp.strip_axis(ax2[col])
         ax2[col].legend()
 
