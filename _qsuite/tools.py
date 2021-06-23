@@ -194,7 +194,7 @@ def FigS3():
     """
     This function generates Fig. S3
     """
-    with open('data_new.json') as json_file:
+    with open('_qsuite/data_new.json') as json_file:
         data = json.load(json_file)
     fig, axs = plt.subplots(2, 3, figsize = (10,4),sharex=True)
     axss = axs.flatten()
@@ -253,7 +253,7 @@ def FigS4():
     """
     This function generates Fig. S4
     """
-    with open('data_new.json') as json_file:
+    with open('_qsuite/data_new.json') as json_file:
         data = json.load(json_file)
     mean_O_exp_y05 =     data["exp0.5"]["absolute"]
     mean_O_sw_exp_y05 =  data["sw_exp0.5"]["absolute"]
@@ -345,7 +345,7 @@ def FigS6():
     """
     This function generates Fig. S6
     """
-    with open('data_new.json') as json_file:
+    with open('_qsuite/data_new.json') as json_file:
         data = json.load(json_file)
     fig, axs = plt.subplots(1, 2, figsize = (10,4),sharex=True,sharey=True)
     axss = axs.flatten()
