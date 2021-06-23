@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from matplotlib.lines import Line2D
 hfont = {'fontname':'Helvetica'}
-plt.rcParams.update({'font.size': 8})
+plt.rcParams.update({'font.size': 10})
 
 import pickle
 import gzip
@@ -21,6 +21,22 @@ colors = [
 'darkseagreen',
 'crimson'
 ]
+def data_main():
+    liste = {"exp":"exp","exp_sw":"sw_exp","sw":"sw","random":"no_lockdown","lockdown":"lockdown"}
+    data = {}
+    data["a"] = list(np.linspace(0,1,25))
+    with open('_qsuite/data_new.json') as json_file:
+        data_new = json.load(json_file)
+    for k,v in liste.items():
+        data[k] = data_new[v]["absolute"]
+
+    for k,v in data.items():
+        if k!= "a":
+            data[k] = [v]
+    with open('_qsuite/data_main.json', 'w') as outfile:
+        json.dump(data, outfile)
+data_main()
+
 def load_export_data():
     """
     This function loads the simulation data and generates a file in which all
@@ -145,7 +161,7 @@ def FigS2():
     axin1.set_xticklabels((int(_R0[0]),int(_R0[10]),int(_R0[20]),int(_R0[30]),int(_R0[40]),int(_R0[50])))
     axin1.set_ylabel(r'CV of $\langle\Omega\rangle/N$')
     lines = [Line2D([0], [0], color = colors[0], alpha = 1, linewidth=1, linestyle='-'),
-             Line2D([0], [0], color = colors[0], alpha = 1, linewidth=1, linestyle='-')]
+             Line2D([0], [0], color = colors[1], alpha = 1, linewidth=1, linestyle='-')]
 
     labels = ['0% app user', '30% app user']
 
@@ -174,7 +190,6 @@ def FigS2():
 
 
     plt.show()
-FigS2()
 def FigS3():
     """
     This function generates Fig. S3
