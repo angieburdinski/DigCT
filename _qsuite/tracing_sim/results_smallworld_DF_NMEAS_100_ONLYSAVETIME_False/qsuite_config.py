@@ -6,17 +6,18 @@ from numpy import random
 import networkx as nx
 #=========== SIMULATION DETAILS ========
 projectname = "paper_tracing"
-basename = "smallworld_exponential_asc_withQ"
+basename = "smallworld_DF"
 
 seed = -1
 N_measurements = 100
 measurements = range(N_measurements)
 N = 200_000
-q = [0,0.1,0.3,0.5]
+q = [0,0.1,0.3,0.5,0.7,0.9]
 a = np.linspace(0,1,25)
-y = [0.1,0.5]
+R0 = 2.5
 quarantiningS = True
 parameter = {
+
         'chi':1/2.5,
         'recovery_rate' : 1/7,
         'alpha' : 1/3,
@@ -25,6 +26,7 @@ parameter = {
         'x':0.17,
         'I_0' : N*0.01,
         'omega':1/10,
+        "y" : 0.1,
         "z": 0.64,
         "R0": 2.5,
         }
@@ -39,9 +41,9 @@ external_parameters = [
 internal_parameters = [
                         ('a', a),
                         ('q', q),
-                        ('y', y),
+
                       ]
-standard_parameters = [
+standard_parameters = [ ('R0', R0 ),
                         ('N', N ),
                         ('quarantiningS', quarantiningS ),
                         ('parameter', parameter ),
@@ -57,8 +59,8 @@ memory = "8G"
 priority = -10
 
 #============ CLUSTER SETTINGS ============
-username =
-server =
+username = "aburd"
+server = "groot0.biologie.hu-berlin.de"
 useratserver = username + u'@' + server
 
 shell = "/bin/bash"
