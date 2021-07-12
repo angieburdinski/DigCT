@@ -18,6 +18,9 @@ large-scale simulations, we use [qsuite](github.com/benmaier/qsuite), a CLI
 to facilitate simulations on HPC clusters. `qsuite` will be installed when
 dependencies are installed from `requirements.txt`.
 
+In order to have the simulations run faster, consider installing
+[SamplableSet](https://github.com/gstonge/SamplableSet).
+
 ## Main model
 
 The main model, including an example configuration,
@@ -26,8 +29,20 @@ To run the simulation, do
 
 ```bash
 cd main_model/
-qsuite local
+python example.py
 ```
+
+In this example, 200 simulations are run, each on a
+distinctly sampled Erdos-Renyi network of `N = 10,000` nodes,
+100 simulations on networks with a 30% app participation rate,
+and 100 simulations on networks with no tracing app.
+
+The code is expected to run for about 10 minutes max on a `regular`
+desktop PC (tested on a 
+
+This is the expected output (see `main_model/example.png`).
+
+![Example](main_model/example.png)
 
 ## Analyses 
 
