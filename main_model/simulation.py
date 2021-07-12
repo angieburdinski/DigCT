@@ -235,10 +235,9 @@ def simulation_code(kwargs):
 
         t, result = model.simulate(tmax = time , sampling_dt = sampling_dt)
 
-        epidemic_curve = sum([ result[C] for C in ['I_P','I_S','I_A','I_Pa','I_Sa','I_Aa'] ])
 
 
-        return t, epidemic_curve
+        return t, result
 
     results = mixed(**kwargs)
 

@@ -52,15 +52,19 @@ kwargs = dict(
 import matplotlib.pyplot as pl
 
 
+def get_epidemic(result):
+    return sum([ result[C] for C in ['I_P','I_S','I_A','I_Pa','I_Sa','I_Aa'] ])
 
 results_tracing = []
 results_no_trac = []
 
 for meas in tqdm(range(n_meas)):
     kwargs['a'] = 0.3
-    t0, result0 = simulation_code(kwargs)
+    _, result0 = simulation_code(kwargs)
+    result0 = get_epidemic(result0)
     kwargs['a'] = 0.0
-    t1, result1 = simulation_code(kwargs)
+    _, result1 = simulation_code(kwargs)
+    result1 = get_epidemic(result1)
 
     results_tracing.append(result0)
     results_no_trac.append(result1)
