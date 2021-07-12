@@ -121,6 +121,6 @@ for i in range(4):
 #axA.plot(data['degree_assortativity'],'-d',c=bp.colors[2])
 #axAN.plot(data['sizes_largest_component'],'-x',c=bp.colors[3])
 fig.tight_layout()
-#fig.savefig('sw_expon_model.png',dpi=300)
+fig.savefig('sw_expon_model.png',dpi=300)
 
 pl.show()
