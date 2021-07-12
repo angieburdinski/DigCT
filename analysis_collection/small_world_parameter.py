@@ -2,6 +2,7 @@ from smallworld.theory import get_effective_medium_eigenvalue_gap
 from smallworld.theory import expected_clustering
 import matplotlib.pyplot as pl
 import numpy as np
+
 def get_beta(N,k_over_2):
     """
     This function is used to get the long range redistribution parameter $\beta$

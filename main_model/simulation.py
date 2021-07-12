@@ -16,6 +16,7 @@ def _edge(i,j):
         return (i,j)
     else:
         raise ValueError('self-loop')
+
 def get_expon_small_world(N,k0,more_lattice_like=False,node_creation_order='random'):
 
     G = nx.empty_graph(N)
@@ -69,6 +70,7 @@ def get_expon_small_world(N,k0,more_lattice_like=False,node_creation_order='rand
     G.add_edges_from(edges)
 
     return G
+
 def confignetwork(N, parameter,**kwargs):
     p = parameter
     k0 = p['number_of_contacts']
@@ -101,10 +103,10 @@ def confignetwork(N, parameter,**kwargs):
     del G
     return edge_weight_tuples, k_norm
 
-def swnetwork(N, parameter,**kwargs):
+def swnetwork(N, parameter,beta=1e-6,**kwargs):
     p = parameter
     k_over_2 = int(p['number_of_contacts']/2)
-    beta = 10e-7 #for k = 20, N = 200_000 or k0=10
+    beta = 1e-6 #for k = 20, N = 200_000 or k0=10
     #beta = 1
     G = get_smallworld_graph(N,k_over_2,beta)
     edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
@@ -125,14 +127,23 @@ def exp_sw_network(N,parameter,**kwargs):
 def simulation_code(kwargs):
 
     def mixed(N, parameter, time, sampling_dt,quarantiningS, a, q, R0, **kwargs):
+
         p = parameter
-        edge_weight_tuples, k_norm = confignetwork(N,parameter)
-        #edge_weight_tuples, k_norm = swnetwork(N, parameter)
+        p['network_model']
+        if p['network_model'] == 'confignetwork':
+            edge_weight_tuples, k_norm = confignetwork(N,parameter)
+        elif p['network_model'] == 'swnetwork':
+            edge_weight_tuples, k_norm = swnetwork(N, parameter)
+        elif p['network_model'] == 'exp_sw_network':
+            edge_weight_tuples, k_norm = swnetwork(N, parameter)
+        elif p['network_model'] == 'er_network':
+            edge_weight_tuples, k_norm = swnetwork(N, parameter, beta=1)
         kappa = (q*p['recovery_rate'])/(1-q)
         IPa0 = int(random.binomial(p['I_0'], a, 1))
         IP0 = int(p['I_0'] - IPa0)
         Sa0 = int(random.binomial(N-p['I_0'], a, 1))
         S0 = int(N - p['I_0'] - Sa0)
+
         if quarantiningS == True:
             model = epipack.StochasticEpiModel(['S','E','I_P','I_S','I_A','R','T','X','Sa','Ea','I_Pa','I_Sa','I_Aa','Ra','Ta','Xa','Qa','C'],N, edge_weight_tuples ,directed=False)
             model.set_conditional_link_transmission_processes({
@@ -234,6 +245,7 @@ def simulation_code(kwargs):
         del result
 
         return results
+
     results = mixed(**kwargs)
 
     return results

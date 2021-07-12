@@ -6,18 +6,16 @@ from numpy import random
 import networkx as nx
 #=========== SIMULATION DETAILS ========
 projectname = "paper_tracing"
-basename = "exponential_R0"
+basename = "exponential_DF"
 
 seed = -1
 N_measurements = 100
-
 measurements = range(N_measurements)
 N = 200_000
-
-q = [0.3]
-a = [0,0.3]
-R0 = np.linspace(0.1,10,51)
-quarantiningS =True
+q = [0,0.1,0.3,0.5,0.7,0.9]
+a = np.linspace(0,1,25)
+R0 = 2.5
+quarantiningS = True
 parameter = {
         'chi':1/2.5,
         'recovery_rate' : 1/7,
@@ -25,10 +23,12 @@ parameter = {
         'beta' : 1/2,
         'number_of_contacts' : 20,
         'x':0.17,
-        'y':0.1,
         'I_0' : N*0.01,
         'omega':1/10,
-        "z":0.64,
+        "y" : 0.1,
+        "z": 0.64,
+        "R0": 2.5,
+        "network_model":'er_network',
         }
 
 sampling_dt = 1
@@ -41,14 +41,13 @@ external_parameters = [
 internal_parameters = [
                         ('a', a),
                         ('q', q),
-                        ('R0', R0),
 
                       ]
-standard_parameters = [
+standard_parameters = [ ('R0', R0 ),
                         ('N', N ),
+                        ('quarantiningS', quarantiningS ),
                         ('parameter', parameter ),
                         ('sampling_dt',sampling_dt),
-                        ("quarantiningS",quarantiningS),
                         ('time',time)
                       ]
 
