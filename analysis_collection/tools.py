@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from matplotlib.lines import Line2D
+
 hfont = {'fontname':'Helvetica'}
 plt.rcParams.update({'font.size': 10})
 
@@ -8,24 +9,26 @@ import pickle
 import gzip
 import json
 import numpy as np
+
 colors = [
-'dimgrey',
-'lightcoral',
-'skyblue',
-'indianred',
-'darkcyan',
-'maroon',
-'darkgoldenrod',
-'navy',
-'mediumvioletred',
-'darkseagreen',
-'crimson'
+    'dimgrey',
+    'lightcoral',
+    'skyblue',
+    'indianred',
+    'darkcyan',
+    'maroon',
+    'darkgoldenrod',
+    'navy',
+    'mediumvioletred',
+    'darkseagreen',
+    'crimson'
 ]
+
 def data_main():
     liste = {"exp":"exp","exp_sw":"sw_exp","sw":"sw","random":"no_lockdown","lockdown":"lockdown"}
     data = {}
     data["a"] = list(np.linspace(0,1,25))
-    with open('_qsuite/data_new.json') as json_file:
+    with open('data_new.json') as json_file:
         data_new = json.load(json_file)
     for k,v in liste.items():
         data[k] = data_new[v]["absolute"]
@@ -33,9 +36,9 @@ def data_main():
     for k,v in data.items():
         if k!= "a":
             data[k] = [v]
-    with open('_qsuite/data_main.json', 'w') as outfile:
+    with open('data_main.json', 'w') as outfile:
         json.dump(data, outfile)
-data_main()
+
 
 def load_export_data():
     """
@@ -46,16 +49,16 @@ def load_export_data():
     Dictionary with absolute outbreak size, rounded initial dark factor (DF_0) and relative outbreak size reduction
     for different settings.
     """
-    exp =           np.load('_qsuite/tracing_sim/results_exponential_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_noQ =       np.load('_qsuite/tracing_sim/results_exponential_withoutQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_low_eff =   np.load('_qsuite/tracing_sim/results_exponential_withQ_halfreact_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    lockdown =      np.load('_qsuite/tracing_sim/results_smallworld_lockdown_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    no_lockdown =   np.load('_qsuite/tracing_sim/results_erdosrenyi_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw =            np.load('_qsuite/tracing_sim/results_smallworld_withQ_v3_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_noQ =        np.load('_qsuite/tracing_sim/results_smallworld_withoutQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_low_eff =    np.load('_qsuite/tracing_sim/results_smallworld_withQ_halfreact_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_exp =        np.load('_qsuite/tracing_sim/results_smallworld_exponential_asc_withQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_exp_  =      np.load('_qsuite/tracing_sim/results_smallworld_exponential_random_withQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    exp =           np.load('tracing_sim/results_exponential_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    exp_noQ =       np.load('tracing_sim/results_exponential_withoutQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    exp_low_eff =   np.load('tracing_sim/results_exponential_withQ_halfreact_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    lockdown =      np.load('tracing_sim/results_smallworld_lockdown_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    no_lockdown =   np.load('tracing_sim/results_erdosrenyi_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    sw =            np.load('tracing_sim/results_smallworld_withQ_v3_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    sw_noQ =        np.load('tracing_sim/results_smallworld_withoutQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    sw_low_eff =    np.load('tracing_sim/results_smallworld_withQ_halfreact_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    sw_exp =        np.load('tracing_sim/results_smallworld_exponential_asc_withQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    sw_exp_  =      np.load('tracing_sim/results_smallworld_exponential_random_withQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
 
     data = {}
     data["exp"] =           exp['mean']
@@ -106,18 +109,19 @@ def load_export_data():
             except:
                 pass
 
-    with open('_qsuite/data_new.json', 'w') as outfile:
+    with open('data_new.json', 'w') as outfile:
         json.dump(data_new, outfile)
+
 def FigS2():
     """
     This function generates Fig. S2
     """
-    DF_sw =   np.load('_qsuite/tracing_sim/results_smallworld_DF_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    DF_exp =  np.load('_qsuite/tracing_sim/results_exponential_DF_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_R0 =  np.load('_qsuite/tracing_sim/results_exponential_R0_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_R0_ = np.load("_qsuite/tracing_sim/results_exponential_R0_NMEAS_100_ONLYSAVETIME_False/results.npy")
-    sw_R0 =  np.load('_qsuite/tracing_sim/results_smallworld_R0_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_R0_ = np.load("_qsuite/tracing_sim/results_smallworld_R0_NMEAS_100_ONLYSAVETIME_False/results.npy")
+    DF_sw =   np.load('tracing_sim/results_smallworld_DF_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    DF_exp =  np.load('tracing_sim/results_exponential_DF_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    exp_R0 =  np.load('tracing_sim/results_exponential_R0_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    exp_R0_ = np.load("tracing_sim/results_exponential_R0_NMEAS_100_ONLYSAVETIME_False/results.npy")
+    sw_R0 =  np.load('tracing_sim/results_smallworld_R0_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    sw_R0_ = np.load("tracing_sim/results_smallworld_R0_NMEAS_100_ONLYSAVETIME_False/results.npy")
     print(DF_sw["mean"].shape)
     DF = {}
     DF["exp"] = {}
@@ -190,11 +194,12 @@ def FigS2():
 
 
     plt.show()
+
 def FigS3():
     """
     This function generates Fig. S3
     """
-    with open('_qsuite/data_new.json') as json_file:
+    with open('data_new.json') as json_file:
         data = json.load(json_file)
     fig, axs = plt.subplots(2, 3, figsize = (10,4),sharex=True)
     axss = axs.flatten()
@@ -249,11 +254,12 @@ def FigS3():
     for i in [3,4,5]:
         axss[i].set_ylim(-40,0)
     plt.show()
+
 def FigS4():
     """
     This function generates Fig. S4
     """
-    with open('_qsuite/data_new.json') as json_file:
+    with open('data_new.json') as json_file:
         data = json.load(json_file)
     mean_O_exp_y05 =     data["exp0.5"]["absolute"]
     mean_O_sw_exp_y05 =  data["sw_exp0.5"]["absolute"]
@@ -341,11 +347,12 @@ def FigS4():
         i.set_yticks((0.3,0.6))
     plt.savefig('Fig6',dpi = 300)
     plt.show()
+
 def FigS6():
     """
     This function generates Fig. S6
     """
-    with open('_qsuite/data_new.json') as json_file:
+    with open('data_new.json') as json_file:
         data = json.load(json_file)
     fig, axs = plt.subplots(1, 2, figsize = (10,4),sharex=True,sharey=True)
     axss = axs.flatten()
@@ -390,3 +397,10 @@ def FigS6():
 
 
     plt.show()
+
+if __name__ == "__main__":
+    data_main()
+    FigS2()
+    FigS3()
+    FigS4()
+    FigS6()
