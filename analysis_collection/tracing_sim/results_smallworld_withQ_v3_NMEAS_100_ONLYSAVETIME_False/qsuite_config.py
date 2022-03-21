@@ -58,7 +58,7 @@ priority = -10
 
 #============ CLUSTER SETTINGS ============
 username =
-server = 
+server =
 useratserver = username + u'@' + server
 
 shell = "/bin/bash"
