@@ -31,15 +31,13 @@ def data_main():
     with open('data_new.json') as json_file:
         data_new = json.load(json_file)
     for k,v in liste.items():
-        data[k] = data_new[v]["absolute"]
+        data[k] = data_new[v+"0.5"]["absolute"]
 
-    for k,v in data.items():
-        if k!= "a":
-            data[k] = [v]
+    #for k,v in data.items():
+    #    if k!= "a":
+    #        data[k] = [v]
     with open('data_main.json', 'w') as outfile:
         json.dump(data, outfile)
-
-
 def load_export_data():
     """
     This function loads the simulation data and generates a file in which all
@@ -60,6 +58,17 @@ def load_export_data():
     sw_exp =        np.load('tracing_sim/results_smallworld_exponential_asc_withQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
     sw_exp_  =      np.load('tracing_sim/results_smallworld_exponential_random_withQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
 
+    exp_noQ_y05 =       np.load('tracing_sim/results_exponential_withoutQ_y05/results_mean_err.npz')
+    exp_low_eff_y05 =   np.load('tracing_sim/results_exponential_withQ_halfreact_y05/results_mean_err.npz')
+    lockdown_y05 =      np.load('tracing_sim/results_smallworld_lockdown_withQ_y05/results_mean_err.npz')
+    no_lockdown_y05 =   np.load('tracing_sim/results_erdosrenyi_withQ_y05/results_mean_err.npz')
+    sw_y05 =            np.load('tracing_sim/results_smallworld_withQ_y05/results_mean_err.npz')
+    sw_noQ_y05 =        np.load('tracing_sim/results_smallworld_withoutQ_y05/results_mean_err.npz')
+    sw_low_eff_y05 =    np.load('tracing_sim/results_smallworld_withQ_halfreact_y05/results_mean_err.npz')
+
+    exp_y1 =           np.load('tracing_sim/results_exponential_withQ_y1_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    sw_exp_y1 =        np.load('tracing_sim/results_smallworld_exponential_asc_withQ_y1_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+
     data = {}
     data["exp"] =           exp['mean']
     data["exp_noQ"] =       exp_noQ['mean']
@@ -73,33 +82,56 @@ def load_export_data():
     data["sw_exp_"] =       sw_exp_['mean']
 
 
+    data["exp_noQ_y05"] =       exp_noQ_y05['mean']
+    data["exp_low_eff_y05"] =   exp_low_eff_y05['mean']
+    data["lockdown_y05"] =      lockdown_y05['mean']
+    data["no_lockdown_y05"] =   no_lockdown_y05['mean']
+    data["sw_y05"] =            sw_y05['mean']
+    data["sw_noQ_y05"] =        sw_noQ_y05['mean']
+    data["sw_low_eff_y05"] =    sw_low_eff_y05['mean']
+
+    data["exp_y1"] =           exp_y1['mean']
+    data["sw_exp_y1"] =        sw_exp_y1['mean']
+
     datalist = [exp,exp_noQ,exp_low_eff,lockdown,no_lockdown,sw,sw_noQ,sw_low_eff,sw_exp,sw_exp_]
     stringlist = ["exp","exp_noQ","exp_low_eff","lockdown","no_lockdown","sw","sw_noQ","sw_low_eff","sw_exp","sw_exp_"]
 
     data_dict = {}
 
     for k,v in data.items():
+        if k in stringlist:
+            data_dict[k] = {}
+            data_dict[k]["O"] = np.array([sum([data[k][:,x,0,i] for i in range(5)]) for x in range(4)])/200_000
+            data_dict[k]["DF"] = (data_dict[k]["O"])/(np.array([sum([data[k][:,x,0,i] for i in [2,3]]) for x in range(4)])/200_000)
+            data_dict[k]["red"] =  [(((data_dict[k]["O"][x]/data_dict[k]["O"][x][0])-1)*100) for x in range(4)]
+            try:
+                data_dict[k]["O_y0.5"] = np.array([sum([data[k][:,x,1,i] for i in range(5)]) for x in range(4)])/200_000
+                data_dict[k]["DF_y0.5"] = (data_dict[k]["O_y0.5"])/(np.array([sum([data[k][:,x,1,i] for i in [2,3]]) for x in range(4)])/200_000)
+                data_dict[k]["red_y0.5"] =   [(((data_dict[k]["O_y0.5"][x]/data_dict[k]["O_y0.5"][x][0])-1)*100) for x in range(4)]
+            except:
+                data_dict[k]["O_y0.5"] = np.array([sum([data[k+"_y05"][:,x,0,i] for i in range(5)]) for x in range(4)])/200_000
+                data_dict[k]["DF_y0.5"] = (data_dict[k]["O_y0.5"])/(np.array([sum([data[k+"_y05"][:,x,0,i] for i in [2,3]]) for x in range(4)])/200_000)
+                data_dict[k]["red_y0.5"] =   [(((data_dict[k]["O_y0.5"][x]/data_dict[k]["O_y0.5"][x][0])-1)*100) for x in range(4)]
 
-        data_dict[k] = {}
-        data_dict[k]["O"] = np.array([sum([data[k][:,x,0,i] for i in range(5)]) for x in range(4)])/200_000
-        data_dict[k]["DF"] = (data_dict[k]["O"])/(np.array([sum([data[k][:,x,0,i] for i in [2,3]]) for x in range(4)])/200_000)
-        data_dict[k]["red"] =  [(((data_dict[k]["O"][x]/data_dict[k]["O"][x][0])-1)*100) for x in range(4)]
-        try:
-            data_dict[k]["O_y0.5"] = np.array([sum([data[k][:,x,1,i] for i in range(5)]) for x in range(4)])/200_000
-            data_dict[k]["DF_y0.5"] = (data_dict[k]["O_y0.5"])/(np.array([sum([data[k][:,x,1,i] for i in [2,3]]) for x in range(4)])/200_000)
-            data_dict[k]["red_y0.5"] =   [(((data_dict[k]["O_y0.5"][x]/data_dict[k]["O_y0.5"][x][0])-1)*100) for x in range(4)]
-        except:
-            pass
-
+            if k in ["exp","sw_exp"]:
+                try:
+                    data_dict[k]["O_y1"] = np.array([sum([data[k+"_y1"][:,x,0,i] for i in range(5)]) for x in range(4)])/200_000
+                    data_dict[k]["DF_y1"] = (data_dict[k]["O_y1"])/(np.array([sum([data[k+"_y1"][:,x,0,i] for i in [2,3]]) for x in range(4)])/200_000)
+                    data_dict[k]["red_y1"] =   [(((data_dict[k]["O_y1"][x]/data_dict[k]["O_y1"][x][0])-1)*100) for x in range(4)]
+                except:
+                    pass
     data_new = {}
 
     for k,v in data_dict.items():
         data_new[k] = {}
         data_new[k+"0.5"] = {}
+        data_new[k+"1"] = {}
         data_new[k]["absolute"] = {}
         data_new[k]["reduction"] = {}
         data_new[k+"0.5"]["absolute"] = {}
         data_new[k+"0.5"]["reduction"] = {}
+        data_new[k+"1"]["absolute"] = {}
+        data_new[k+"1"]["reduction"] = {}
         for i in range(4):
             data_new[k]["absolute"][str(np.round(data_dict[k]["DF"][i][0]))] = list(data_dict[k]["O"][i])
             data_new[k]["reduction"][str(np.round(data_dict[k]["DF"][i][0]))] = list(data_dict[k]["red"][i])
@@ -108,20 +140,23 @@ def load_export_data():
                 data_new[k+"0.5"]["reduction"][str(np.round(data_dict[k]["DF_y0.5"][i][0]))] = list(data_dict[k]["red_y0.5"][i])
             except:
                 pass
-
+            try:
+                data_new[k+"1"]["absolute"][str(np.round(data_dict[k]["DF_y1"][i][0]))] = list(data_dict[k]["O_y1"][i])
+                data_new[k+"1"]["reduction"][str(np.round(data_dict[k]["DF_y1"][i][0]))] = list(data_dict[k]["red_y1"][i])
+            except:
+                pass
     with open('data_new.json', 'w') as outfile:
         json.dump(data_new, outfile)
-
 def FigS2():
     """
     This function generates Fig. S2
     """
-    DF_sw =   np.load('tracing_sim/results_smallworld_DF_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    DF_exp =  np.load('tracing_sim/results_exponential_DF_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_R0 =  np.load('tracing_sim/results_exponential_R0_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_R0_ = np.load("tracing_sim/results_exponential_R0_NMEAS_100_ONLYSAVETIME_False/results.npy")
-    sw_R0 =  np.load('tracing_sim/results_smallworld_R0_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_R0_ = np.load("tracing_sim/results_smallworld_R0_NMEAS_100_ONLYSAVETIME_False/results.npy")
+    DF_sw =   np.load('tracing_sim/results_smallworld_DF_y05_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    DF_exp =  np.load('tracing_sim/results_exponential_DF_y05_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    exp_R0 =  np.load('tracing_sim/results_exponential_R0_y05_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    exp_R0_ = np.load("tracing_sim/results_exponential_R0_y05_NMEAS_100_ONLYSAVETIME_False/results.npy")
+    sw_R0 =  np.load('tracing_sim/results_smallworld_R0_y05_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
+    sw_R0_ = np.load("tracing_sim/results_smallworld_R0_y05_NMEAS_100_ONLYSAVETIME_False/results.npy")
     print(DF_sw["mean"].shape)
     DF = {}
     DF["exp"] = {}
@@ -191,10 +226,7 @@ def FigS2():
     ax[2].set_xticklabels(labels2)
     ax[2].set_ylabel('dark factor DF')
     ax[2].set_xlabel('app participation $a$ [%]')
-
-
     plt.show()
-
 def FigS3():
     """
     This function generates Fig. S3
@@ -209,13 +241,12 @@ def FigS3():
     xlabels = ('0%',"25%","50%", "75%",'100%')
     xpositions_ = (0, 12, 24)
     xlabels_ = ('0%',"50%", '100%')
-    liste = ["sw","sw_low_eff","sw_noQ","exp","exp_low_eff","exp_noQ"]
+    liste = ["sw0.5","sw_low_eff0.5","sw_noQ0.5","exp0.5","exp_low_eff0.5","exp_noQ0.5"]
     count = 0
     for i in liste:
         k_list = [k_ for k_ in data[i]["reduction"].keys()]
         if len(k_list) !=0:
             ax = axss[count]
-            #ax.set_title(i + k_list[1] + k_list[2] + k_list[3])
             count+=1
             axin = ax.inset_axes([0.15, 0.1,0.35, 0.3])
 
@@ -245,16 +276,16 @@ def FigS3():
             ax.set_xticklabels(xlabels)
 
             axss[0].set_ylabel('outbreak size reduction')
+            axss[3].set_ylabel('outbreak size reduction')
             ax.set_xlabel('app participation')
             axin.set_xticks(xpositions_)
             axin.set_xticklabels(xlabels_)
             axin.text(0,1,r'$\langle\Omega\rangle$/N',transform=axin.transAxes,ha='right',va='bottom',**hfont)
     for i in range(3):
-        axss[i].set_ylim(-75,0)
+        axss[i].set_ylim(-80,0)
     for i in [3,4,5]:
-        axss[i].set_ylim(-40,0)
+        axss[i].set_ylim(-50,0)
     plt.show()
-
 def FigS4():
     """
     This function generates Fig. S4
@@ -264,11 +295,11 @@ def FigS4():
     mean_O_exp_y05 =     data["exp0.5"]["absolute"]
     mean_O_sw_exp_y05 =  data["sw_exp0.5"]["absolute"]
 
-    mean_O_exp =        data["exp"]["absolute"]
-    mean_O_sw_exp =     data["sw_exp"]["absolute"]
+    mean_O_exp_y1 =        data["exp1"]["absolute"]
+    mean_O_sw_exp_y1 =     data["sw_exp1"]["absolute"]
 
-    red_exp =       data["exp"]["reduction"]
-    red_sw_exp =    data["sw_exp"]["reduction"]
+    red_exp_y1 =       data["exp1"]["reduction"]
+    red_sw_exp_y1 =    data["sw_exp1"]["reduction"]
     red_exp_y05 =   data["exp0.5"]["reduction"]
     red_sw_exp_y05 = data["sw_exp0.5"]["reduction"]
 
@@ -282,39 +313,39 @@ def FigS4():
     axin3 = ax[1,1].inset_axes([0.15, 0.1,0.35, 0.3])
     axins = [axin0,axin1,axin2,axin3]
     for i in ["12.0","2.0"]:
-        ax[0,0].plot(red_exp[i],color = "k",  alpha = 1)
-        ax[0,1].plot(red_exp_y05[i],color = "k",  alpha = 1)
-        ax[1,0].plot(red_sw_exp[i],color = "k",  alpha = 1)
-        ax[1,1].plot(red_sw_exp_y05[i],color = "k",  alpha = 1)
-        axin0.plot(mean_O_exp[i],color = "k",  alpha = 1)
-        axin1.plot(mean_O_exp_y05[i],color = "k",  alpha = 1)
-        axin2.plot(mean_O_sw_exp[i],color = "k",  alpha = 1)
-        axin3.plot(mean_O_sw_exp_y05[i],color = "k",  alpha = 1)
+        ax[0,0].plot(red_exp_y05[i],color = "k",  alpha = 1)
+        ax[0,1].plot(red_exp_y1[i],color = "k",  alpha = 1)
+        ax[1,0].plot(red_sw_exp_y05[i],color = "k",  alpha = 1)
+        ax[1,1].plot(red_sw_exp_y1[i],color = "k",  alpha = 1)
+        axin0.plot(mean_O_exp_y05[i],color = "k",  alpha = 1)
+        axin1.plot(mean_O_exp_y1[i],color = "k",  alpha = 1)
+        axin2.plot(mean_O_sw_exp_y05[i],color = "k",  alpha = 1)
+        axin3.plot(mean_O_sw_exp_y1[i],color = "k",  alpha = 1)
 
-    ax[0,0].plot(red_exp["4.0"],color = "k",  alpha = 1,marker = "o")
-    ax[0,1].plot(red_exp_y05["4.0"],color = "k",  alpha = 1,marker = "o")
-    ax[1,0].plot(red_sw_exp["4.0"],color = "k",  alpha = 1,marker = "o")
-    ax[1,1].plot(red_sw_exp_y05["4.0"],color = "k",  alpha = 1,marker = "o")
-    axin0.plot(mean_O_exp["4.0"],color = "k",  alpha = 1,marker = ".")
-    axin1.plot(mean_O_exp_y05["4.0"],color = "k",  alpha = 1,marker = ".")
-    axin2.plot(mean_O_sw_exp["4.0"],color = "k",  alpha = 1,marker = ".")
-    axin3.plot(mean_O_sw_exp_y05["4.0"],color = "k",  alpha = 1,marker = ".")
+    ax[0,0].plot(red_exp_y05["4.0"],color = "k",  alpha = 1,marker = "o")
+    ax[0,1].plot(red_exp_y1["4.0"],color = "k",  alpha = 1,marker = "o")
+    ax[1,0].plot(red_sw_exp_y05["4.0"],color = "k",  alpha = 1,marker = "o")
+    ax[1,1].plot(red_sw_exp_y1["4.0"],color = "k",  alpha = 1,marker = "o")
+    axin0.plot(mean_O_exp_y05["4.0"],color = "k",  alpha = 1,marker = ".")
+    axin1.plot(mean_O_exp_y1["4.0"],color = "k",  alpha = 1,marker = ".")
+    axin2.plot(mean_O_sw_exp_y05["4.0"],color = "k",  alpha = 1,marker = ".")
+    axin3.plot(mean_O_sw_exp_y1["4.0"],color = "k",  alpha = 1,marker = ".")
 
-    ax[0,0].fill_between(a,red_exp["12.0"],red_exp["2.0"], color = "grey", alpha = 0.3)
-    ax[0,1].fill_between(a,red_exp_y05["12.0"],red_exp_y05["2.0"], color = "grey", alpha = 0.3)
-    ax[1,0].fill_between(a,red_sw_exp["12.0"],red_sw_exp["2.0"], color = "grey", alpha = 0.3)
-    ax[1,1].fill_between(a,red_sw_exp_y05["12.0"],red_sw_exp_y05["2.0"], color = "grey", alpha = 0.3)
+    ax[0,0].fill_between(a,red_exp_y05["12.0"],red_exp_y05["2.0"], color = "grey", alpha = 0.3)
+    ax[0,1].fill_between(a,red_exp_y1["12.0"],red_exp_y1["2.0"], color = "grey", alpha = 0.3)
+    ax[1,0].fill_between(a,red_sw_exp_y05["12.0"],red_sw_exp_y05["2.0"], color = "grey", alpha = 0.3)
+    ax[1,1].fill_between(a,red_sw_exp_y1["12.0"],red_sw_exp_y1["2.0"], color = "grey", alpha = 0.3)
 
-    axin0.fill_between(a,mean_O_exp["12.0"],mean_O_exp["2.0"], color = "grey", alpha = 0.3)
-    axin1.fill_between(a,mean_O_exp_y05["12.0"],mean_O_exp_y05["2.0"], color = "grey", alpha = 0.3)
-    axin2.fill_between(a,mean_O_sw_exp["12.0"],mean_O_sw_exp["2.0"], color = "grey", alpha = 0.3)
-    axin3.fill_between(a,mean_O_sw_exp_y05["12.0"],mean_O_sw_exp_y05["2.0"], color = "grey", alpha = 0.3)
+    axin0.fill_between(a,mean_O_exp_y05["12.0"],mean_O_exp_y05["2.0"], color = "grey", alpha = 0.3)
+    axin1.fill_between(a,mean_O_exp_y1["12.0"],mean_O_exp_y1["2.0"], color = "grey", alpha = 0.3)
+    axin2.fill_between(a,mean_O_sw_exp_y05["12.0"],mean_O_sw_exp_y05["2.0"], color = "grey", alpha = 0.3)
+    axin3.fill_between(a,mean_O_sw_exp_y1["12.0"],mean_O_sw_exp_y1["2.0"], color = "grey", alpha = 0.3)
 
     positions = (0, 6, 12, 18, 24)
     xlabels = ('0%',"25%","50%", "75%",'100%')
 
     positionsy1 = (0, -10, -20, -30, -40, -50, -60, -70)
-    xlabelsy1 = ('0%', "-10%", "-20%", "-30%", "-40%", "-50%", "-60%", "-70%")
+    xlabelsy1 = ('0%', "-10%", "-20%", "-30%", "-40%", "-50%", "-60%", "-70%","-70%")
 
     positionsy = (0, -10, -20, -30, -40)
     xlabelsy = ('0%', "-10%", "-20%", "-30%", "-40%")
@@ -325,29 +356,26 @@ def FigS4():
         for j in [0,1]:
             ax[i,j].set_xticks(positions)
             ax[i,j].set_xticklabels(xlabels,**hfont)
-            ax[0,i].set_yticks(positionsy)
-            ax[0,i].set_yticklabels(xlabelsy,**hfont)
-            ax[1,i].set_yticks(positionsy1)
-            ax[1,i].set_yticklabels(xlabelsy1,**hfont)
+            #ax[0,i].set_yticks(positionsy)
+            #ax[0,i].set_yticklabels(xlabelsy,**hfont)
+            #ax[1,i].set_yticks(positionsy1)
+            #ax[1,i].set_yticklabels(xlabelsy1,**hfont)
             ax[i,j].set_xlabel(r'app participation $a$',**hfont)
             ax[i,0].set_ylabel(r'outbreak size reduction',**hfont)
-            ax[0,i].set_ylim(-40,0)
-            ax[1,i].set_ylim(-80,0)
-
+            ax[0,i].set_ylim(-50,0)
+            ax[1,i].set_ylim(-90,0)
+            ax[i,j].yaxis.set_major_formatter(mtick.PercentFormatter())
     for i in axins:
-
         i.set_xticks(positions1)
         i.set_xticklabels(xlabels1,**hfont)
         i.text(0,1,r'$\langle\Omega\rangle$/N',transform=i.transAxes,ha='right',va='bottom',**hfont)
     for i in [axin0,axin1]:
-        i.set_ylim(0.3,0.7)
-        i.set_yticks((0.4,0.6))
-    for i in [axin2,axin3]:
-        i.set_ylim(0.1,0.7)
+        i.set_ylim(0.2,0.7)
         i.set_yticks((0.3,0.6))
-    plt.savefig('Fig6',dpi = 300)
+    for i in [axin2,axin3]:
+        i.set_ylim(0,0.7)
+        i.set_yticks((0.2,0.6))
     plt.show()
-
 def FigS6():
     """
     This function generates Fig. S6
@@ -361,7 +389,7 @@ def FigS6():
     xlabels = ('0%',"25%","50%", "75%",'100%')
     xpositions_ = (0, 12, 24)
     xlabels_ = ('0%',"50%", '100%')
-    liste = ["sw_exp","sw_exp_"]
+    liste = ["sw_exp0.5","sw_exp_0.5"]
     count = 0
     for i in liste:
         k_list = [k_ for k_ in data[i]["reduction"].keys()]
@@ -390,17 +418,17 @@ def FigS6():
             ax.set_xticklabels(xlabels)
 
             axss[0].set_ylabel('outbreak size reduction')
+
             ax.set_xlabel('app participation')
             axin.set_xticks(xpositions_)
             axin.set_xticklabels(xlabels_)
             axin.text(0,1,r'$\langle\Omega\rangle$/N',transform=axin.transAxes,ha='right',va='bottom',**hfont)
-
-
     plt.show()
 
 if __name__ == "__main__":
-    data_main()
-    FigS2()
-    FigS3()
-    FigS4()
+    #load_export_data()
+    #data_main()
+    #FigS2()
+    #FigS3()
+    #FigS4()
     FigS6()
