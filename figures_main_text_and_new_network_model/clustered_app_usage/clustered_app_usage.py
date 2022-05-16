@@ -8,14 +8,15 @@ import networkx as nx
 from epipack.stochastic_epi_models import StochasticEpiModel
 from scipy.stats import expon
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 from smallworld import get_smallworld_graph
-N = 1000
+N = 100
 colors = [
     'dimgrey',
     'lightcoral',
 ]
 parameter = {'number_of_contacts':20}
-app = np.linspace(0.001,0.99,10)
+app = np.linspace(0.001,0.99,5)
 def _edge(i,j):
     if i > j:
         return (j,i)
@@ -114,19 +115,38 @@ def confignetwork(N, parameter,**kwargs):
     k_norm = 2*len(edge_weight_tuples) / N
     del G
     return edge_weight_tuples
-def swnetwork(N, parameter,**kwargs):
+def erdos_network(N, parameter,**kwargs):
     p = parameter
     k_over_2 = int(p['number_of_contacts']/2)
-    #beta = 10e-7 #for k = 20, N = 200_000 or k0=10
-    beta = 1e-4
+    beta = 1
     G = get_smallworld_graph(N,k_over_2,beta)
     edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
     k_norm = 2*len(edge_weight_tuples) / N
     del G
     return edge_weight_tuples
-edge_weight_tuples = exp_sw_network(N,parameter)
-#edge_weight_tuples = confignetwork(N,parameter)
-#edge_weight_tuples = swnetwork(N, parameter)
+def swnetwork(N, parameter,**kwargs):
+    p = parameter
+    k_over_2 = int(p['number_of_contacts']/2)
+    beta = 10e-7 #for k = 20, N = 200_000 or k0=10
+    #beta = 1e-4
+    G = get_smallworld_graph(N,k_over_2,beta)
+    edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
+    k_norm = 2*len(edge_weight_tuples) / N
+    del G
+    return edge_weight_tuples
+def lattice_network(N, parameter,**kwargs):
+    p = parameter
+    k_over_2 = int(p['number_of_contacts']/2)
+    beta = 0
+    G = get_smallworld_graph(N,k_over_2,beta)
+    edge_weight_tuples = [ (e[0], e[1], 1.0) for e in G.edges() ]
+    k_norm = 2*len(edge_weight_tuples) / N
+    del G
+    return edge_weight_tuples
+
+ewt_expsw = exp_sw_network(N,parameter)
+ewt_sw = swnetwork(N, parameter)
+ewt_list = [ewt_sw,ewt_expsw]
 def get_app_user(N, app):
     if 0 < app < 1:
         mu = N/2
@@ -140,19 +160,23 @@ def get_app_user(N, app):
     return list(app_user)
 
 def plot_foundcontacts():
-    fig,ax = plt.subplots(1,2)
-    app_user = [random.sample(list(range(0, N)), int(N*k)) for k in app]
-    counts = [sum(1 for i,j,k in edge_weight_tuples if i in x and j in x) for x in app_user]
-    ax[0].plot(app,[i / (len(edge_weight_tuples)) for i in counts], color = colors[0])
-    ax[1].hist(app_user[3], color = colors[0], alpha = 0.5,bins = np.arange(0,N+N/10,N/10))
-    app_user1 =  [get_app_user(N, k) for k in app]
-    counts1 = [sum(1 for i,j,k in edge_weight_tuples if i in x and j in x) for x in app_user1]
-    ax[0].plot(app,[i / (len(edge_weight_tuples)) for i in counts1], color = colors[1])
-    ax[1].hist(app_user1[3], color = colors[1], alpha = 0.5,bins = np.arange(0,N+N/10,N/10))
-    ax[0].set_ylabel("found contacts")
-    ax[1].set_ylabel("app participants")
-    ax[0].set_xlabel("app participation")
-    ax[1].set_xlabel("node index")
-    ax[1].set_xlim([0,N])
+
+    fig,ax = plt.subplots(2,len(ewt_list))
+    for ewt, edge_weight_tuples in enumerate(ewt_list):
+        non_clus_app = [random.sample(list(range(0, N)), int(N*k)) for k in app]
+        non_clus_counts = [sum(1 for i,j,k in edge_weight_tuples if i in x and j in x) for x in non_clus_app]
+        clus_app =  [get_app_user(N, k) for k in app]
+        clus_counts = [sum(1 for i,j,k in edge_weight_tuples if i in x and j in x) for x in clus_app]
+        ax[0,ewt].plot(app * 100,[i / (len(edge_weight_tuples)) for i in non_clus_counts], color = colors[1],label = 'clustered = False')
+        ax[1,ewt].hist(non_clus_app[1], color = colors[1], alpha = 0.5,bins = np.arange(0,N+N/10,N/10))
+        ax[0,ewt].plot(app * 100,[i / (len(edge_weight_tuples)) for i in clus_counts], color = colors[0],label = 'clustered = True')
+        ax[1,ewt].hist(clus_app[1], color = colors[0], alpha = 0.5,bins = np.arange(0,N+N/10,N/10))
+        ax[0,0].set_ylabel("found contacts")
+        ax[1,0].set_ylabel("app participants")
+        ax[0,ewt].set_xlabel("app participation")
+        ax[1,ewt].set_xlabel("node index")
+        ax[1,ewt].set_xlim([0,N])
+        ax[0,0].legend()
+        ax[0,ewt].xaxis.set_major_formatter(mtick.PercentFormatter())
     plt.show()
 plot_foundcontacts()

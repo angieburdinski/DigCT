@@ -1,16 +1,12 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from matplotlib.lines import Line2D
-
-hfont = {'fontname':'Helvetica'}
-plt.rcParams.update({'font.size': 10})
-
-import pickle
-import gzip
 import json
 import numpy as np
 
-colors = [
+plt.rcParams.update({'font.size': 10,
+                    'font.sans-serif': 'Helvetica'})
+c = [
     'dimgrey',
     'lightcoral',
     'skyblue',
@@ -24,6 +20,14 @@ colors = [
     'crimson'
 ]
 
+folder  = 'tracing_sim/results_'
+file = '/results_mean_err.npz'
+a_positions = (0, 6, 12, 18, 24)
+a_labels = ('0%', '25%', '50%', '75%', '100%')
+a_positions_inset = (0, 12, 24)
+a_labels_inset = ('0%', '50%', '100%')
+N = 200_000
+
 def data_main():
     liste = {"exp":"exp","exp_sw":"sw_exp","sw":"sw","random":"no_lockdown","lockdown":"lockdown"}
     data = {}
@@ -31,11 +35,7 @@ def data_main():
     with open('data_new.json') as json_file:
         data_new = json.load(json_file)
     for k,v in liste.items():
-        data[k] = data_new[v+"0.5"]["absolute"]
-
-    #for k,v in data.items():
-    #    if k!= "a":
-    #        data[k] = [v]
+        data[k] = data_new[v+"_y05"]["absolute"]
     with open('data_main.json', 'w') as outfile:
         json.dump(data, outfile)
 def load_export_data():
@@ -44,391 +44,222 @@ def load_export_data():
     computed results are saved.
     Return
     -------
+
     Dictionary with absolute outbreak size, rounded initial dark factor (DF_0) and relative outbreak size reduction
     for different settings.
     """
-    exp =           np.load('tracing_sim/results_exponential_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_noQ =       np.load('tracing_sim/results_exponential_withoutQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_low_eff =   np.load('tracing_sim/results_exponential_withQ_halfreact_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    lockdown =      np.load('tracing_sim/results_smallworld_lockdown_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    no_lockdown =   np.load('tracing_sim/results_erdosrenyi_withQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw =            np.load('tracing_sim/results_smallworld_withQ_v3_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_noQ =        np.load('tracing_sim/results_smallworld_withoutQ_v2_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_low_eff =    np.load('tracing_sim/results_smallworld_withQ_halfreact_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_exp =        np.load('tracing_sim/results_smallworld_exponential_asc_withQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_exp_  =      np.load('tracing_sim/results_smallworld_exponential_random_withQ_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-
-    exp_noQ_y05 =       np.load('tracing_sim/results_exponential_withoutQ_y05/results_mean_err.npz')
-    exp_low_eff_y05 =   np.load('tracing_sim/results_exponential_withQ_halfreact_y05/results_mean_err.npz')
-    lockdown_y05 =      np.load('tracing_sim/results_smallworld_lockdown_withQ_y05/results_mean_err.npz')
-    no_lockdown_y05 =   np.load('tracing_sim/results_erdosrenyi_withQ_y05/results_mean_err.npz')
-    sw_y05 =            np.load('tracing_sim/results_smallworld_withQ_y05/results_mean_err.npz')
-    sw_noQ_y05 =        np.load('tracing_sim/results_smallworld_withoutQ_y05/results_mean_err.npz')
-    sw_low_eff_y05 =    np.load('tracing_sim/results_smallworld_withQ_halfreact_y05/results_mean_err.npz')
-
-    exp_y1 =           np.load('tracing_sim/results_exponential_withQ_y1_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_exp_y1 =        np.load('tracing_sim/results_smallworld_exponential_asc_withQ_y1_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-
     data = {}
-    data["exp"] =           exp['mean']
-    data["exp_noQ"] =       exp_noQ['mean']
-    data["exp_low_eff"] =   exp_low_eff['mean']
-    data["lockdown"] =      lockdown['mean']
-    data["no_lockdown"] =   no_lockdown['mean']
-    data["sw"] =            sw['mean']
-    data["sw_noQ"] =        sw_noQ['mean']
-    data["sw_low_eff"] =    sw_low_eff['mean']
-    data["sw_exp"] =        sw_exp['mean']
-    data["sw_exp_"] =       sw_exp_['mean']
 
+    data['exp']=           np.load(folder+'exponential_withQ_v2_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['exp_noQ'] =       np.load(folder+'exponential_withoutQ_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['exp_low_eff'] =   np.load(folder+'exponential_withQ_halfreact_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['lockdown'] =      np.load(folder+'smallworld_lockdown_withQ_v2_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['no_lockdown'] =   np.load(folder+'erdosrenyi_withQ_v2_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['sw'] =            np.load(folder+'smallworld_withQ_v3_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['sw_noQ'] =        np.load(folder+'smallworld_withoutQ_v2_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['sw_low_eff'] =    np.load(folder+'smallworld_withQ_halfreact_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['sw_exp'] =        np.load(folder+'smallworld_exponential_asc_withQ_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['sw_exp_']  =      np.load(folder+'smallworld_exponential_random_withQ_NMEAS_100_ONLYSAVETIME_False'+file)
 
-    data["exp_noQ_y05"] =       exp_noQ_y05['mean']
-    data["exp_low_eff_y05"] =   exp_low_eff_y05['mean']
-    data["lockdown_y05"] =      lockdown_y05['mean']
-    data["no_lockdown_y05"] =   no_lockdown_y05['mean']
-    data["sw_y05"] =            sw_y05['mean']
-    data["sw_noQ_y05"] =        sw_noQ_y05['mean']
-    data["sw_low_eff_y05"] =    sw_low_eff_y05['mean']
+    data['exp_noQ_y05'] =       np.load(folder+'exponential_withoutQ_y05'+file)
+    data['exp_low_eff_y05'] =   np.load(folder+'exponential_withQ_halfreact_y05'+file)
+    data['lockdown_y05'] =      np.load(folder+'smallworld_lockdown_withQ_y05'+file)
+    data['no_lockdown_y05'] =   np.load(folder+'erdosrenyi_withQ_y05'+file)
+    data['sw_y05'] =            np.load(folder+'smallworld_withQ_y05'+file)
+    data['sw_noQ_y05'] =        np.load(folder+'smallworld_withoutQ_y05'+file)
+    data['sw_low_eff_y05'] =    np.load(folder+'smallworld_withQ_halfreact_y05'+file)
 
-    data["exp_y1"] =           exp_y1['mean']
-    data["sw_exp_y1"] =        sw_exp_y1['mean']
+    data['exp_y1'] =           np.load(folder+'exponential_withQ_y1_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['sw_exp_y1'] =        np.load(folder+'smallworld_exponential_asc_withQ_y1_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['exp_chi10'] =        np.load(folder+'exponential_withQ_chi10_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['sw_exp_chi10'] =     np.load(folder+'smallworld_exponential_asc_withQ_chi10_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['exp_z1'] =        np.load(folder+'exponential_withQ_z1_NMEAS_100_ONLYSAVETIME_False'+file)
+    data['sw_exp_z1'] =     np.load(folder+'smallworld_exponential_asc_withQ_z1_NMEAS_100_ONLYSAVETIME_False'+file)
 
-    datalist = [exp,exp_noQ,exp_low_eff,lockdown,no_lockdown,sw,sw_noQ,sw_low_eff,sw_exp,sw_exp_]
-    stringlist = ["exp","exp_noQ","exp_low_eff","lockdown","no_lockdown","sw","sw_noQ","sw_low_eff","sw_exp","sw_exp_"]
+    keys = list(data.keys())
+    for k in keys:
+        data[k] = data[k]['mean']
 
-    data_dict = {}
-
-    for k,v in data.items():
-        if k in stringlist:
-            data_dict[k] = {}
-            data_dict[k]["O"] = np.array([sum([data[k][:,x,0,i] for i in range(5)]) for x in range(4)])/200_000
-            data_dict[k]["DF"] = (data_dict[k]["O"])/(np.array([sum([data[k][:,x,0,i] for i in [2,3]]) for x in range(4)])/200_000)
-            data_dict[k]["red"] =  [(((data_dict[k]["O"][x]/data_dict[k]["O"][x][0])-1)*100) for x in range(4)]
-            try:
-                data_dict[k]["O_y0.5"] = np.array([sum([data[k][:,x,1,i] for i in range(5)]) for x in range(4)])/200_000
-                data_dict[k]["DF_y0.5"] = (data_dict[k]["O_y0.5"])/(np.array([sum([data[k][:,x,1,i] for i in [2,3]]) for x in range(4)])/200_000)
-                data_dict[k]["red_y0.5"] =   [(((data_dict[k]["O_y0.5"][x]/data_dict[k]["O_y0.5"][x][0])-1)*100) for x in range(4)]
-            except:
-                data_dict[k]["O_y0.5"] = np.array([sum([data[k+"_y05"][:,x,0,i] for i in range(5)]) for x in range(4)])/200_000
-                data_dict[k]["DF_y0.5"] = (data_dict[k]["O_y0.5"])/(np.array([sum([data[k+"_y05"][:,x,0,i] for i in [2,3]]) for x in range(4)])/200_000)
-                data_dict[k]["red_y0.5"] =   [(((data_dict[k]["O_y0.5"][x]/data_dict[k]["O_y0.5"][x][0])-1)*100) for x in range(4)]
-
-            if k in ["exp","sw_exp"]:
-                try:
-                    data_dict[k]["O_y1"] = np.array([sum([data[k+"_y1"][:,x,0,i] for i in range(5)]) for x in range(4)])/200_000
-                    data_dict[k]["DF_y1"] = (data_dict[k]["O_y1"])/(np.array([sum([data[k+"_y1"][:,x,0,i] for i in [2,3]]) for x in range(4)])/200_000)
-                    data_dict[k]["red_y1"] =   [(((data_dict[k]["O_y1"][x]/data_dict[k]["O_y1"][x][0])-1)*100) for x in range(4)]
-                except:
-                    pass
-    data_new = {}
-
-    for k,v in data_dict.items():
-        data_new[k] = {}
-        data_new[k+"0.5"] = {}
-        data_new[k+"1"] = {}
-        data_new[k]["absolute"] = {}
-        data_new[k]["reduction"] = {}
-        data_new[k+"0.5"]["absolute"] = {}
-        data_new[k+"0.5"]["reduction"] = {}
-        data_new[k+"1"]["absolute"] = {}
-        data_new[k+"1"]["reduction"] = {}
+    calc = {}
+    for k in keys:
+        calc[k] = {}
+        O   = np.array([sum([data[k][:,x,0,i] for i in range(5)]) for x in range(4)])/N
+        DF  = O/(np.array([sum([data[k][:,x,0,i] for i in [2,3]]) for x in range(4)])/N)
+        red = [(((O[x]/O[x][0])-1)*100) for x in range(4)]
+        calc[k]["absolute"] = {}
+        calc[k]["reduction"] = {}
         for i in range(4):
-            data_new[k]["absolute"][str(np.round(data_dict[k]["DF"][i][0]))] = list(data_dict[k]["O"][i])
-            data_new[k]["reduction"][str(np.round(data_dict[k]["DF"][i][0]))] = list(data_dict[k]["red"][i])
-            try:
-                data_new[k+"0.5"]["absolute"][str(np.round(data_dict[k]["DF_y0.5"][i][0]))] = list(data_dict[k]["O_y0.5"][i])
-                data_new[k+"0.5"]["reduction"][str(np.round(data_dict[k]["DF_y0.5"][i][0]))] = list(data_dict[k]["red_y0.5"][i])
-            except:
-                pass
-            try:
-                data_new[k+"1"]["absolute"][str(np.round(data_dict[k]["DF_y1"][i][0]))] = list(data_dict[k]["O_y1"][i])
-                data_new[k+"1"]["reduction"][str(np.round(data_dict[k]["DF_y1"][i][0]))] = list(data_dict[k]["red_y1"][i])
-            except:
-                pass
+            calc[k]["absolute"][str(np.round(DF[i][0]))] = list(O[i])
+            calc[k]["reduction"][str(np.round(DF[i][0]))] = list(red[i])
+        try:
+            O   = np.array([sum([data[k][:,x,1,i] for i in range(5)]) for x in range(4)])/N
+            DF  = O/(np.array([sum([data[k][:,x,1,i] for i in [2,3]]) for x in range(4)])/N)
+            red = [(((O[x]/O[x][0])-1)*100) for x in range(4)]
+            calc[k+'_y05'] = {}
+            calc[k+'_y05']["absolute"] = {}
+            calc[k+'_y05']["reduction"] = {}
+            for i in range(4):
+                calc[k+'_y05']["absolute"][str(np.round(DF[i][0]))] = list(O[i])
+                calc[k+'_y05']["reduction"][str(np.round(DF[i][0]))] = list(red[i])
+        except:
+            pass
     with open('data_new.json', 'w') as outfile:
-        json.dump(data_new, outfile)
+        json.dump(calc, outfile)
+
 def FigS2():
     """
     This function generates Fig. S2
     """
-    DF_sw =   np.load('tracing_sim/results_smallworld_DF_y05_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    DF_exp =  np.load('tracing_sim/results_exponential_DF_y05_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_R0 =  np.load('tracing_sim/results_exponential_R0_y05_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    exp_R0_ = np.load("tracing_sim/results_exponential_R0_y05_NMEAS_100_ONLYSAVETIME_False/results.npy")
-    sw_R0 =  np.load('tracing_sim/results_smallworld_R0_y05_NMEAS_100_ONLYSAVETIME_False/results_mean_err.npz')
-    sw_R0_ = np.load("tracing_sim/results_smallworld_R0_y05_NMEAS_100_ONLYSAVETIME_False/results.npy")
-    print(DF_sw["mean"].shape)
-    DF = {}
-    DF["exp"] = {}
-    DF["sw"] = {}
-    DF["exp"]["O"] = DF_exp['mean']
-    DF["sw"]["O"] =  DF_sw['mean']
-    for k,v in DF.items():
-        DF[k]["DF"] = (np.array([sum([DF[k]["O"][:,x,i] for i in range(5)]) for x in range(6)])/200_000)/\
-                      (np.array([sum([DF[k]["O"][:,x,i] for i in [2,3]]) for x in range(6)])/200_000)
-        print(DF[k]["DF"].shape)
-
-    _R0 = np.linspace(0.1,10,51)
-
-    exp_R0_0 = np.array(sum([exp_R0['mean'][0,0,:,i] for i in range(5)]))/200_000
-    exp_R0_3 = np.array(sum([exp_R0['mean'][1,0,:,i] for i in range(5)]))/200_000
-    exp_R0_var_0 = np.var(np.array(sum([exp_R0_[:,0,0,:,i] for i in range(5)]))/200_000, axis = 0)/exp_R0_0**2
-    exp_R0_var_3 = np.var(np.array(sum([exp_R0_[:,1,0,:,i] for i in range(5)]))/200_000, axis = 0)/exp_R0_3**2
-
-    sw_R0_0 = np.array(sum([sw_R0['mean'][0,0,:,i] for i in range(5)]))/200_000
-    sw_R0_3 = np.array(sum([sw_R0['mean'][1,0,:,i] for i in range(5)]))/200_000
-    sw_R0_var_0 = np.var(np.array(sum([sw_R0_[:,0,0,:,i] for i in range(5)]))/200_000, axis = 0)/sw_R0_0**2
-    sw_R0_var_3 = np.var(np.array(sum([sw_R0_[:,1,0,:,i] for i in range(5)]))/200_000, axis = 0)/sw_R0_3**2
+    networks = ['sw','exp']
 
     fig, ax = plt.subplots(1,3,figsize = (18,4))
 
-    ax[0].plot(exp_R0_0, color = colors[0])
-    ax[0].plot(exp_R0_3, color = colors[1])
-    axin0 = ax[0].inset_axes([0.54, 0.1,0.4, 0.4])
-    axin0.plot(exp_R0_var_0, color = colors[0])
-    axin0.plot(exp_R0_var_3, color = colors[1])
+    R_0 = {}
+    R_0['sw'] =  {}
+    R_0['sw']['mean'] = np.load(folder+'smallworld_R0_y05_NMEAS_100_ONLYSAVETIME_False'+file)
+    R_0['sw']['all'] = np.load(folder+'smallworld_R0_y05_NMEAS_100_ONLYSAVETIME_False/results.npy')
 
-    axin0.set_xticks((0,10,20,30,40,50))
-    axin0.set_xticklabels((int(_R0[0]),int(_R0[10]),int(_R0[20]),int(_R0[30]),int(_R0[40]),int(_R0[50])))
-    axin0.set_ylabel(r'CV of $\langle\Omega\rangle/N$')
-    ax[1].plot(sw_R0_0, color = colors[0])
-    ax[1].plot(sw_R0_3, color = colors[1])
-    axin1 = ax[1].inset_axes([0.55, 0.1, 0.4, 0.4])
-    axin1.plot(sw_R0_var_0, color = colors[0])
-    axin1.plot(sw_R0_var_3, color = colors[1])
-    axin1.set_xticks((0,10,20,30,40,50))
-    axin1.set_xticklabels((int(_R0[0]),int(_R0[10]),int(_R0[20]),int(_R0[30]),int(_R0[40]),int(_R0[50])))
-    axin1.set_ylabel(r'CV of $\langle\Omega\rangle/N$')
-    lines = [Line2D([0], [0], color = colors[0], alpha = 1, linewidth=1, linestyle='-'),
-             Line2D([0], [0], color = colors[1], alpha = 1, linewidth=1, linestyle='-')]
+    R_0['exp'] =  {}
+    R_0['exp']['mean'] = np.load(folder+'exponential_R0_y05_NMEAS_100_ONLYSAVETIME_False'+file)
+    R_0['exp']['all'] = np.load(folder+'exponential_R0_y05_NMEAS_100_ONLYSAVETIME_False/results.npy')
 
+    for k in networks:
+        R_0[k]['mean'] = R_0[k]['mean']['mean']
+
+    _R0 = np.linspace(0.1,10,51)
+    lines = [Line2D([0], [0], color = c[i], alpha = 1, linewidth=2, linestyle='-') for i in range(2)]
     labels = ['0% app user', '30% app user']
 
-    for i in [0,1]:
-        ax[i].set_ylabel(r'$\langle\Omega\rangle/N$')
-        ax[i].set_ylim(0,1)
-        ax[i].legend(lines,labels)
-        ax[i].set_xlabel('$R_0$')
-        ax[i].set_xticks((0,10,20,30,40,50))
-        ax[i].set_xticklabels((int(_R0[0]),int(_R0[10]),int(_R0[20]),int(_R0[30]),int(_R0[40]),int(_R0[50])))
+    for k_ix, k in enumerate(networks):
+        axin = ax[k_ix].inset_axes([0.54, 0.1,0.4, 0.4])
 
+        for a_ix in range(2):
+            mean = np.array(sum([R_0[k]['mean'][a_ix,0,:,i] for i in range(5)]))/N
+            var = np.var(np.array(sum([R_0[k]['all'][:,a_ix,0,:,i] for i in range(5)]))/N, axis = 0)/mean**2
+            ax[k_ix].plot(mean, color = c[a_ix])
+            axin.plot(var, color = c[a_ix])
+
+        axin.set_xticks((0,10,20,30,40,50))
+        axin.set_xticklabels((int(_R0[0]),int(_R0[10]),int(_R0[20]),int(_R0[30]),int(_R0[40]),int(_R0[50])))
+        axin.set_ylabel(r'CV of $\langle\Omega\rangle/N$')
+
+        ax[k_ix].set_ylabel(r'$\langle\Omega\rangle/N$')
+        ax[k_ix].set_ylim(0,1)
+        ax[k_ix].legend(lines,labels)
+        ax[k_ix].set_xlabel('$R_0$')
+        ax[k_ix].set_xticks((0,10,20,30,40,50))
+        ax[k_ix].set_xticklabels((int(_R0[0]),int(_R0[10]),int(_R0[20]),int(_R0[30]),int(_R0[40]),int(_R0[50])))
+
+
+    DF = {}
+    DF['sw'] =  np.load(folder+'smallworld_DF_y05_NMEAS_100_ONLYSAVETIME_False'+file)
+    DF['exp'] = np.load(folder+'exponential_DF_y05_NMEAS_100_ONLYSAVETIME_False'+file)
+    for k in networks:
+        DF[k] = DF[k]['mean']
+        DF[k] = (np.array([sum([DF[k][:,x,i] for i in range(5)]) for x in range(6)])/N)/\
+                      (np.array([sum([DF[k][:,x,i] for i in [2,3]]) for x in range(6)])/N)
     for i in range(6):
-        ax[2].plot(DF["exp"]["DF"][i],color = colors[i],linewidth=2, ls = '-')
-        ax[2].plot(DF["sw"]["DF"][i],color = colors[i],linewidth=2,ls = ':')
+        ax[2].plot(DF["exp"][i],color = c[i],linewidth=2, ls = '-')
+        ax[2].plot(DF["sw"][i],color = c[i],linewidth=2,ls = ':')
 
-    positions2 = (0,6,12,18,24)
-    labels2 = (0,25,50,75,100)
-    lines2 = [Line2D([0], [0], color = colors[i], alpha = 1, linewidth=2, linestyle='-') for i in [1,2,3,4,5]]
-    ylabels2 = ['q = 0.1','q = 0.3','q = 0.5','q = 0.7','q = 0.9']
 
-    ax[2].legend(lines2,ylabels2)
-    ax[2].set_xticks(positions2)
-    ax[2].set_xticklabels(labels2)
+    lines_DF = [Line2D([0], [0], color = c[i], alpha = 1, linewidth=2, linestyle='-') for i in [1,2,3,4,5]]
+    ylabels_DF = ['q = 0.1','q = 0.3','q = 0.5','q = 0.7','q = 0.9']
+
+    ax[2].legend(lines_DF,ylabels_DF)
+    ax[2].set_xticks(a_positions)
+    ax[2].set_xticklabels(a_labels)
     ax[2].set_ylabel('dark factor DF')
     ax[2].set_xlabel('app participation $a$ [%]')
+
     plt.show()
+
+def standard_plot(sims):
+
+    """ This function generates for a string-list of simulation names a standard plot"""
+
+    with open('data_new.json') as json_file:
+        data = json.load(json_file)
+
+    a = np.linspace(0,24,25)
+    lb = "2.0"
+    ub = "12.0"
+    mid = "4.0"
+    if len(sims) > 2:
+        fig, ax = plt.subplots(2,int(len(sims)/2),figsize = (10,4), sharey = True)
+    else:
+        fig, ax = plt.subplots(1,2,figsize = (25,10), sharey = 'row')
+
+    axs = ax.flatten()
+
+    for ix, res in enumerate(sims):
+        axin = axs[ix].inset_axes([0.19, 0.13,0.35, 0.3])
+        for i in [ub,lb]:
+            axs[ix].plot(data[res]['reduction'][i], color = "k",  alpha = 1)
+            axin.plot(data[res]['absolute'][i],     color = "k",  alpha = 1)
+        axs[ix].plot(data[res]['reduction'][mid],   color = "k",  alpha = 1, marker = ".")
+        axin.plot(data[res]['absolute'][mid],       color = "k",  alpha = 1, marker = ".")
+        axs[ix].fill_between(a,data[res]['reduction'][ub],data[res]['reduction'][lb],   color = "grey", alpha = 0.3)
+        axin.fill_between(a,data[res]['absolute'][ub],data[res]['absolute'][lb],        color = "grey", alpha = 0.3)
+        axs[ix].set_xticks(a_positions)
+        axs[ix].set_xticklabels(a_labels )
+
+        if data[sims[int(len(sims)/2)]]['reduction'][lb][-1] <= np.min(data[sims[0]]['reduction'][lb][-1]):
+            axs[ix].set_ylim(np.min(data[sims[int(len(sims)/2)]]['reduction'][lb])-5,0)
+        else:
+            axs[ix].set_ylim(np.min(data[sims[0]]['reduction'][lb])-5,0)
+        if ix < int(len(sims)/2):
+
+            for i in [ub,lb]:
+                axs[ix].fill_between(a,data[sims[0]]['reduction'][ub],data[sims[0]]['reduction'][lb],   color = "navy", alpha = 0.1)
+                axin.fill_between(a,data[sims[0]]['absolute'][ub],data[sims[0]]['absolute'][lb],        color = "navy", alpha = 0.1)
+
+
+
+            axin.set_ylim(np.min(data[sims[0]]['absolute'][lb])-0.05,np.max(data[sims[0]]['absolute'][ub])+0.05)
+            if len(sims) <= 2:
+                axs[ix].set_xlabel(r'app participation $a$' )
+        else:
+
+            for i in [ub,lb]:
+                axs[ix].fill_between(a,data[sims[int(len(sims)/2)]]['reduction'][ub],data[sims[int(len(sims)/2)]]['reduction'][lb],   color = "navy", alpha = 0.1)
+                axin.fill_between(a,data[sims[int(len(sims)/2)]]['absolute'][ub],data[sims[int(len(sims)/2)]]['absolute'][lb],        color = "navy", alpha = 0.1)
+
+
+            axin.set_ylim(np.min(data[sims[int(len(sims)/2)]]['absolute'][lb])-0.05,np.max(data[sims[int(len(sims)/2)]]['absolute'][ub])+0.05)
+            axs[ix].set_xlabel(r'app participation $a$' )
+
+
+        axs[ix].yaxis.set_major_formatter(mtick.PercentFormatter())
+        axin.set_xticks(a_positions_inset)
+        axin.set_xticklabels(a_labels_inset )
+        axin.text(0,1,r'$\langle\Omega\rangle$/N',transform=axin.transAxes,ha='right',va='bottom' )
+        #axs[ix].set_title(res)
+    axs[0].set_ylabel(r'outbreak size reduction' )
+    if len(sims) > 2:
+        axs[int(len(sims)/2)].set_ylabel(r'outbreak size reduction' )
+    plt.show()
+
 def FigS3():
-    """
-    This function generates Fig. S3
-    """
-    with open('data_new.json') as json_file:
-        data = json.load(json_file)
-    fig, axs = plt.subplots(2, 3, figsize = (10,4),sharex=True)
-    axss = axs.flatten()
+    """ This function generates Fig. S3 """
+    sims = ["sw_y05","sw_low_eff_y05","sw_noQ_y05","exp_y05","exp_low_eff_y05","exp_noQ_y05"]
+    standard_plot(sims)
 
-    a = np.linspace(0,24,25)
-    xpositions = (0, 6, 12, 18, 24)
-    xlabels = ('0%',"25%","50%", "75%",'100%')
-    xpositions_ = (0, 12, 24)
-    xlabels_ = ('0%',"50%", '100%')
-    liste = ["sw0.5","sw_low_eff0.5","sw_noQ0.5","exp0.5","exp_low_eff0.5","exp_noQ0.5"]
-    count = 0
-    for i in liste:
-        k_list = [k_ for k_ in data[i]["reduction"].keys()]
-        if len(k_list) !=0:
-            ax = axss[count]
-            count+=1
-            axin = ax.inset_axes([0.15, 0.1,0.35, 0.3])
-
-            if count <=3:
-                axin.set_ylim(0,0.8)
-                axin.set_yticks((0.3,0.7))
-            else:
-                axin.set_ylim(0.3,0.7)
-                axin.set_yticks((0.4,0.6))
-            for k_,v_ in data[i]["reduction"].items():
-                if k_ == k_list[1] or k_ == k_list[3]:
-                    ax.plot(v_,color = "k",  alpha = 1)
-                if k_ == k_list[2]:
-                    ax.plot(v_,color = "k",  alpha = 1,marker = "o")
-
-            ax.fill_between(a,data[i]["reduction"][k_list[1]],data[i]["reduction"][k_list[3]], color = "grey", alpha = 0.3)
-
-            for k,v in data[i]["absolute"].items():
-                if k == k_list[1] or k == k_list[3]:
-                    axin.plot(v,color = "k",  alpha = 1)
-                if k == k_list[2]:
-                    axin.plot(v,color = "k",  alpha = 1,marker = ".")
-
-            axin.fill_between(a,data[i]["absolute"][k_list[1]],data[i]["absolute"][k_list[3]], color = "grey", alpha = 0.3)
-            ax.yaxis.set_major_formatter(mtick.PercentFormatter())
-            ax.set_xticks(xpositions)
-            ax.set_xticklabels(xlabels)
-
-            axss[0].set_ylabel('outbreak size reduction')
-            axss[3].set_ylabel('outbreak size reduction')
-            ax.set_xlabel('app participation')
-            axin.set_xticks(xpositions_)
-            axin.set_xticklabels(xlabels_)
-            axin.text(0,1,r'$\langle\Omega\rangle$/N',transform=axin.transAxes,ha='right',va='bottom',**hfont)
-    for i in range(3):
-        axss[i].set_ylim(-80,0)
-    for i in [3,4,5]:
-        axss[i].set_ylim(-50,0)
-    plt.show()
 def FigS4():
-    """
-    This function generates Fig. S4
-    """
-    with open('data_new.json') as json_file:
-        data = json.load(json_file)
-    mean_O_exp_y05 =     data["exp0.5"]["absolute"]
-    mean_O_sw_exp_y05 =  data["sw_exp0.5"]["absolute"]
+    """ This function generates Fig. S4 """
+    sims = ['exp_y05','exp_y1', 'exp_chi10','exp_z1', 'sw_exp_y05','sw_exp_y1','sw_exp_chi10','sw_exp_z1']
+    standard_plot(sims)
 
-    mean_O_exp_y1 =        data["exp1"]["absolute"]
-    mean_O_sw_exp_y1 =     data["sw_exp1"]["absolute"]
-
-    red_exp_y1 =       data["exp1"]["reduction"]
-    red_sw_exp_y1 =    data["sw_exp1"]["reduction"]
-    red_exp_y05 =   data["exp0.5"]["reduction"]
-    red_sw_exp_y05 = data["sw_exp0.5"]["reduction"]
-
-    fig, ax = plt.subplots(2,2,figsize = (14,10))
-    a = np.linspace(0,24,25)
-
-
-    axin0 = ax[0,0].inset_axes([0.15, 0.1,0.35, 0.3])
-    axin1 = ax[0,1].inset_axes([0.15, 0.1,0.35, 0.3])
-    axin2 = ax[1,0].inset_axes([0.15, 0.1,0.35, 0.3])
-    axin3 = ax[1,1].inset_axes([0.15, 0.1,0.35, 0.3])
-    axins = [axin0,axin1,axin2,axin3]
-    for i in ["12.0","2.0"]:
-        ax[0,0].plot(red_exp_y05[i],color = "k",  alpha = 1)
-        ax[0,1].plot(red_exp_y1[i],color = "k",  alpha = 1)
-        ax[1,0].plot(red_sw_exp_y05[i],color = "k",  alpha = 1)
-        ax[1,1].plot(red_sw_exp_y1[i],color = "k",  alpha = 1)
-        axin0.plot(mean_O_exp_y05[i],color = "k",  alpha = 1)
-        axin1.plot(mean_O_exp_y1[i],color = "k",  alpha = 1)
-        axin2.plot(mean_O_sw_exp_y05[i],color = "k",  alpha = 1)
-        axin3.plot(mean_O_sw_exp_y1[i],color = "k",  alpha = 1)
-
-    ax[0,0].plot(red_exp_y05["4.0"],color = "k",  alpha = 1,marker = "o")
-    ax[0,1].plot(red_exp_y1["4.0"],color = "k",  alpha = 1,marker = "o")
-    ax[1,0].plot(red_sw_exp_y05["4.0"],color = "k",  alpha = 1,marker = "o")
-    ax[1,1].plot(red_sw_exp_y1["4.0"],color = "k",  alpha = 1,marker = "o")
-    axin0.plot(mean_O_exp_y05["4.0"],color = "k",  alpha = 1,marker = ".")
-    axin1.plot(mean_O_exp_y1["4.0"],color = "k",  alpha = 1,marker = ".")
-    axin2.plot(mean_O_sw_exp_y05["4.0"],color = "k",  alpha = 1,marker = ".")
-    axin3.plot(mean_O_sw_exp_y1["4.0"],color = "k",  alpha = 1,marker = ".")
-
-    ax[0,0].fill_between(a,red_exp_y05["12.0"],red_exp_y05["2.0"], color = "grey", alpha = 0.3)
-    ax[0,1].fill_between(a,red_exp_y1["12.0"],red_exp_y1["2.0"], color = "grey", alpha = 0.3)
-    ax[1,0].fill_between(a,red_sw_exp_y05["12.0"],red_sw_exp_y05["2.0"], color = "grey", alpha = 0.3)
-    ax[1,1].fill_between(a,red_sw_exp_y1["12.0"],red_sw_exp_y1["2.0"], color = "grey", alpha = 0.3)
-
-    axin0.fill_between(a,mean_O_exp_y05["12.0"],mean_O_exp_y05["2.0"], color = "grey", alpha = 0.3)
-    axin1.fill_between(a,mean_O_exp_y1["12.0"],mean_O_exp_y1["2.0"], color = "grey", alpha = 0.3)
-    axin2.fill_between(a,mean_O_sw_exp_y05["12.0"],mean_O_sw_exp_y05["2.0"], color = "grey", alpha = 0.3)
-    axin3.fill_between(a,mean_O_sw_exp_y1["12.0"],mean_O_sw_exp_y1["2.0"], color = "grey", alpha = 0.3)
-
-    positions = (0, 6, 12, 18, 24)
-    xlabels = ('0%',"25%","50%", "75%",'100%')
-
-    positionsy1 = (0, -10, -20, -30, -40, -50, -60, -70)
-    xlabelsy1 = ('0%', "-10%", "-20%", "-30%", "-40%", "-50%", "-60%", "-70%","-70%")
-
-    positionsy = (0, -10, -20, -30, -40)
-    xlabelsy = ('0%', "-10%", "-20%", "-30%", "-40%")
-
-    positions1 = (0, 12, 24)
-    xlabels1 = ('0%',"50%",'100%')
-    for i in [0,1]:
-        for j in [0,1]:
-            ax[i,j].set_xticks(positions)
-            ax[i,j].set_xticklabels(xlabels,**hfont)
-            #ax[0,i].set_yticks(positionsy)
-            #ax[0,i].set_yticklabels(xlabelsy,**hfont)
-            #ax[1,i].set_yticks(positionsy1)
-            #ax[1,i].set_yticklabels(xlabelsy1,**hfont)
-            ax[i,j].set_xlabel(r'app participation $a$',**hfont)
-            ax[i,0].set_ylabel(r'outbreak size reduction',**hfont)
-            ax[0,i].set_ylim(-50,0)
-            ax[1,i].set_ylim(-90,0)
-            ax[i,j].yaxis.set_major_formatter(mtick.PercentFormatter())
-    for i in axins:
-        i.set_xticks(positions1)
-        i.set_xticklabels(xlabels1,**hfont)
-        i.text(0,1,r'$\langle\Omega\rangle$/N',transform=i.transAxes,ha='right',va='bottom',**hfont)
-    for i in [axin0,axin1]:
-        i.set_ylim(0.2,0.7)
-        i.set_yticks((0.3,0.6))
-    for i in [axin2,axin3]:
-        i.set_ylim(0,0.7)
-        i.set_yticks((0.2,0.6))
-    plt.show()
 def FigS6():
-    """
-    This function generates Fig. S6
-    """
-    with open('data_new.json') as json_file:
-        data = json.load(json_file)
-    fig, axs = plt.subplots(1, 2, figsize = (10,4),sharex=True,sharey=True)
-    axss = axs.flatten()
-    a = np.linspace(0,24,25)
-    xpositions = (0, 6, 12, 18, 24)
-    xlabels = ('0%',"25%","50%", "75%",'100%')
-    xpositions_ = (0, 12, 24)
-    xlabels_ = ('0%',"50%", '100%')
-    liste = ["sw_exp0.5","sw_exp_0.5"]
-    count = 0
-    for i in liste:
-        k_list = [k_ for k_ in data[i]["reduction"].keys()]
-        if len(k_list) !=0:
-            ax = axss[count]
-            count+=1
-            axin = ax.inset_axes([0.15, 0.1,0.35, 0.3])
-
-            for k_,v_ in data[i]["reduction"].items():
-                if k_ == k_list[1] or k_ == k_list[3]:
-                    ax.plot(v_,color = "k",  alpha = 1)
-                if k_ == k_list[2]:
-                    ax.plot(v_,color = "k",  alpha = 1,marker = "o")
-
-            ax.fill_between(a,data[i]["reduction"][k_list[1]],data[i]["reduction"][k_list[3]], color = "grey", alpha = 0.3)
-
-            for k,v in data[i]["absolute"].items():
-                if k == k_list[1] or k == k_list[3]:
-                    axin.plot(v,color = "k",  alpha = 1)
-                if k == k_list[2]:
-                    axin.plot(v,color = "k",  alpha = 1,marker = ".")
-
-            axin.fill_between(a,data[i]["absolute"][k_list[1]],data[i]["absolute"][k_list[3]], color = "grey", alpha = 0.3)
-            ax.yaxis.set_major_formatter(mtick.PercentFormatter())
-            ax.set_xticks(xpositions)
-            ax.set_xticklabels(xlabels)
-
-            axss[0].set_ylabel('outbreak size reduction')
-
-            ax.set_xlabel('app participation')
-            axin.set_xticks(xpositions_)
-            axin.set_xticklabels(xlabels_)
-            axin.text(0,1,r'$\langle\Omega\rangle$/N',transform=axin.transAxes,ha='right',va='bottom',**hfont)
-    plt.show()
+    """ This function generates Fig. S6 """
+    sims = ["sw_exp_y05","sw_exp__y05"]
+    standard_plot(sims)
 
 if __name__ == "__main__":
-    #load_export_data()
-    #data_main()
+
+    load_export_data()
+    data_main()
     #FigS2()
-    #FigS3()
+    FigS3()
     #FigS4()
-    FigS6()
+    #FigS6()
