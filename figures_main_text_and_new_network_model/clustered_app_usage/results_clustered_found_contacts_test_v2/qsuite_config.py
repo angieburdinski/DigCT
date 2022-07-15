@@ -1,6 +1,6 @@
 import os
 import numpy as np
-
+"""note clustered = [True, False] means actually [False, True]. There was a mistake in the simulation.py"""
 #=========== SIMULATION DETAILS ========
 projectname = "paper_tracing"
 basename = 'clustered_found_contacts_test_v2'

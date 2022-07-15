@@ -58,8 +58,8 @@ priority = -10
 
 
 #============ CLUSTER SETTINGS ============
-username = "aburd"
-server = "groot0.biologie.hu-berlin.de"
+username =
+server = 
 useratserver = username + u'@' + server
 
 shell = "/bin/bash"

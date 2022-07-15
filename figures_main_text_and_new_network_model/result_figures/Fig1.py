@@ -41,7 +41,8 @@ c = [
       '#FFB000',
       ]
 c[0] = '#333333'
-c[1] = '#888888'
+#c[1] = '#888888'
+c[1] = '#5540BF'
 
 #colors = [
 #            (0,0,0),       #black
@@ -134,7 +135,7 @@ net = networks[inet]
 #             #       'connectionstyle':'-',
 #                 }
 #               )
-
+ax.axhline(-9, color = 'k', alpha = 0.5, ls = 'dotted')
 for iDF, DF in enumerate([DF_low,DF_main,DF_high]):
     lbl = DF
     if lbl[-1] == '0':
@@ -275,7 +276,6 @@ axs[0,0].text(1.35,0.82,'increased\nparticipation',rotation=0,)
 fig.tight_layout()
 axs[0,0].set_xticks(range(len(aval)))
 axs[0,0].set_xticklabels(['{0:d}%'.format(int(v*100)) for v in aval])
-
 #axs[1,0].text(1.1,-0.2,'app participation $a$',ha='center',transform=axs[1,0].transAxes)
 for i in range(2):
     axs[1,i].set_xlabel('app participation $a$      ',loc='right')
