@@ -35,6 +35,6 @@ def get_beta(N,k_over_2):
 
     pl.show()
 if __name__ == "__main__":
-    N = 200_001
+    N = 10001
     k_over_2 = 10
     get_beta(N,k_over_2)
