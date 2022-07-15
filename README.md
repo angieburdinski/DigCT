@@ -122,12 +122,12 @@ print(result.keys())
 ## Manuscript analyses 
 
 Almost all simulations and analyses performed in the paper
-can be found in `analysis_collection/tracing_sim/`.
+can be found in `analysis_collection/tracing_sim/` except for the "explicit-delay model" which can be found in `analysis_collection/excplicit_det_model.py` and the heterogeneous app participation which can be found in `figures_main_text_and_new_network_model/clustered_app_usage`.
 
 All extracted (summarized) data can be found in
-`analysis_collection/data_new.json`.
+`analysis_collection/data_new.json` and `analysis_collection/tools.py`.
 
-Code to produce the figures in the main text from distilled analysis
+Code to produce the figures in the main and SI text from distilled analysis
 results and analyses for the locally clustered network with
 exponential degree distribution can be found in
 `figures_main_text_and_new_network_model/`, `analysis_collection/tools.py`, 
