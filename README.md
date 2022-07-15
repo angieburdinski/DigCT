@@ -130,11 +130,7 @@ All extracted (summarized) data can be found in
 Code to produce the figures in the main text from distilled analysis
 results and analyses for the locally clustered network with
 exponential degree distribution can be found in
-`figures_main_text_and_new_network_model/`.
-
-Code for plots in the SI can be found in
-`analysis_collection/tools.py` except for Fig. S7-S8 -- those can
-be found in the respective directories 
+`figures_main_text_and_new_network_model/`, `analysis_collection/tools.py`, 
 `analysis_collection/tracing_sim/results_deleting_edges_*`
 and `analysis_collection/tracing_sim/results_toy_model/`.
 
