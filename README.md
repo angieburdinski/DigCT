@@ -1,8 +1,8 @@
 # Digital Contact Tracing
 
 This package provides the simulation, analysis, and figure code for
-the manuscript "Digital contact tracing contributes little to COVID-19
-outbreak containment" by A. Burdinski, D. Brockmann, and B. F. Maier.
+the manuscript "Understanding the impact of digital contact tracing during the COVID-19 pandemic"
+by A. Burdinski, D. Brockmann, and B. F. Maier.
 
 ## Prerequisites
 
